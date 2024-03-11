@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>  <h1 class="text-center mt-3 mb-4">Les Articles</h1></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        header {
+            background-color: #3e31ee;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #3e31ee;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .team-member {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .team-member img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background-color: #3e31ee;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<section class="grid-container">
+
+
+  <!-- Affichage de la liste des articles sous forme de cartes -->
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let article of articles">
+      <div class="card">
+        <img [src]="article.photo" class="card-img-top" alt="">
+        <div class="card-body">
+          <h5 class="card-title">{{ article.titre }}</h5>
+          <p class="card-text">{{ article.description }}</p>
+          <p class="card-text">Prix : {{ article.prix }}</p>
+          <p class="card-text">Livrable : {{ article.Livrable }}</p>
+          <p class="card-text">Statut : {{ article.statut }}</p>
+          <p class="card-text">Quantité : {{ article.quantite }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,14 @@
+.pt-24 {
+    /* Ajustez le padding-top pour laisser de l'espace pour l'image */
+    padding-top: 5px; /* Vous pouvez ajuster cette valeur selon vos besoins */
+  }
+  .absolute inset-0 object-cover object-center w-full h-full{
+    background-position: center; /* Centrer l'image de fond */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Utilisation de la hauteur de l'écran */
+    margin: 0;
+    min-height: 100vh;
+  
+  }

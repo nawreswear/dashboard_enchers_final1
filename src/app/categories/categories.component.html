@@ -1,0 +1,24 @@
+
+<div *ngIf="loading" class="d-flex justify-content-center align-items-center bg-light border rounded p-3">
+  <span class="spinner-border mr-2" role="status" aria-hidden="true"></span>
+  <span class="h5 mb-0 text-muted">Chargement des catégories...</span>
+</div>
+
+
+        <h1>Les catégories</h1>
+
+<div class="card-container">
+  <div *ngFor="let category of categories" class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ category?.titre }}</h5>
+      <p class="card-text">{{ category?.description }}</p>
+      <ng-container *ngIf="isValidURL(category.image)">
+        <img [src]="category.image" alt="Category Image" class="card-img-top">
+      </ng-container>
+      <ng-container *ngIf="!isValidURL(category.image)">
+        <span>Aucune image disponible pour le moment </span>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<div style="margin-bottom: 12px;margin-left: 20px;margin-right: 20px;"></div>

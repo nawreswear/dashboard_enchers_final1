@@ -1,0 +1,129 @@
+/* CSS pour le formulaire d'ajout d'article */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+/* CSS pour le tableau d'affichage des articles */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ffffff;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #ffffff;
+}
+
+.table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.table tr:hover {
+  background-color: #ffffff;
+}
+
+.btn--warning {
+  background-color: #18d50b;
+  color: #212529;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.btn--warningg {
+  background-color: #ed1313;
+  color: #212529;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+h1 {
+  font-size: 24px;
+  color: #09044b; /* Couleur bleue */
+  font-family: 'Times New Roman', Times, serif;
+  text-align: center; /* Centrer le texte */
+  font-weight: bold;
+}
+/* Style pour les cartes d'articles */
+.card {
+  border: 1px solid #ddd; /* Bordure grise */
+  border-radius: 5px; /* Coins arrondis */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  transition: box-shadow 0.3s ease; /* Animation de transition */
+  width: 300px; /* Largeur de la carte */
+  height: 300px;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Effet d'ombre plus prononcé au survol */
+}
+
+.card-img-top {
+  width: 100%;
+  height: auto;
+  border-top-left-radius: 5px; /* Coins arrondis pour l'image uniquement */
+  border-top-right-radius: 5px; /* Coins arrondis pour l'image uniquement */
+}
+
+.card-body {
+  padding: 20px; /* Espacement à l'intérieur de la carte */
+}
+
+.card-title {
+  font-size: 1.25rem; /* Taille de la police du titre */
+  font-weight: bold; /* Texte en gras */
+}
+
+.card-text {
+  margin-bottom: 10px; /* Espacement entre les paragraphes de texte */
+}
+
