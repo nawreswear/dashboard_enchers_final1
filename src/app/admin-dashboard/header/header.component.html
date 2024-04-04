@@ -1,0 +1,64 @@
+<Header style=" background-color: #0a2250 ">
+   
+    <div class="px-5 mx-auto">
+       
+        <div class="w-full flex justify-between items-center">
+            <!-- Icon at the top left corner -->
+            <div class="flex items-center"> <!-- New div to hold the icon image -->
+                <!-- Icon image with circular shape -->
+                <img src="assets/e85db64f09db121b8f6db6adac4e8897.jpg" alt="Icon" class="h-20 w-20 rounded-full">
+            </div>
+            <div class="ml-auto"> <!-- Add this div and apply ml-auto class -->
+                <!-- Search input -->
+                <input class="flex w-[200px] md:w-[350px] sm:w-[250px] rounded-md border border-input
+                    bg-transparent px-3 py-2 text-sm ring-offset-background
+                    file:border-0 file:bg-transparent file:text-sm
+                    file:font-medium placeholder:text-muted-foreground
+                    focus-visible:outline-none pr-6" type="text" placeholder="Search...">
+            </div>
+                 <div class="flex items-center space-x-4">
+               
+         
+                <!-- Icon for Login 
+                <span class="h-10 relative w-10 grid rounded-full place-content-center bg-black">
+                    <i class="text-xl text-white text-muted-foreground fa-solid fa-sign-in">
+                        <a href="/login" class="nav-link" routerLink="login"></a>
+                    </i>
+                </span>-->
+
+                <!-- Icon for Logout -->
+                
+            <span *ngIf="authService.isLoggedIn()" (click)="logout()"  class="h-10   relative w-10 grid rounded-full place-content-center cursor-pointer bg-black ">
+                        <i class="text-xl text-white text-muted-foreground fa-solid fa-sign-out"></i>
+                </span>
+                    <span (click)="toggleUserInfo()" class="h-10 relative w-10 grid rounded-full place-content-center bg-black">
+                      <i class="fas fa-user-circle text-xl text-white text-muted-foreground mr-2"></i>
+                      <div class="arrow-down"></div>
+                      <div *ngIf="showUserInfo" class="profile-bubble">
+                        <p class="info-label">Email:</p>
+                        <p class="info-value">{{ authService.getUserEmail() }}</p>
+                        <p class="info-label">Nom:</p>
+                        <p class="info-value">{{ authService.getUserPassword() }}</p>
+                        <p class="info-label">Type:</p>
+                        <p class="info-value">{{ authService.getUserType() }}</p>
+                      </div>
+                    </span>
+                
+                <span (click)="togglePosition()"
+                    class="h-10   relative w-10 grid rounded-full place-content-center cursor-pointer bg-black ">
+                    <i class="text-xl text-white text-muted-foreground fa-solid fa-bell"></i>
+                    <span class="fly-item bg-red-500">{{errorMsg.length}}</span>
+                    <div class="z-1  absolute errors transition-all right-0  xs:w-[150px] w-[270px] p-3
+                     bg-black
+                     rounded-lg " [style.top]="divTop">
+                        <ul>
+                           
+                        </ul>
+                    </div>
+                </span>
+               
+            </div>
+        </div>
+    </div>
+    
+</Header>

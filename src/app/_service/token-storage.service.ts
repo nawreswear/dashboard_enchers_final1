@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 interface User {
+  id:string;
   username: string;
   email: string;
   password: string;
@@ -56,7 +57,11 @@ export class TokenStorageService {
     console.log("Email récupéré :", email);
     return email;
   }
-
+  getUserId(): string | null {
+    const id = localStorage.getItem('id');
+    console.log("Email récupéré :", id);
+    return id;
+  }
   getUserPassword(): string | null {
     const password = localStorage.getItem('password');
     console.log("Mot de passe récupéré :", password);

@@ -1,19 +1,18 @@
-export interface User {
+export class  User {
   
-    nom: string ,
-    email: string ,
-    password: string;
-    prenom: string ;
-    tel: string ;
-    type: string[] ; 
-    codePostal: number ; 
-    pays: string ; 
-    ville: string ; 
-    cin: number ; 
-    longitude: number ; 
-    latitude: number ;
-    photo: String
-  id: string;
+  id:string='';
+  nom: string = '';
+  email: string = '';
+  password: string = '';
+  prenom: string = '';
+  tel: string = '';
+  type: string[] = []; 
+  codePostal: number = 0; 
+  pays: string = ''; 
+  ville: string = ''; 
+  cin: number = 0; 
+  longitude: number = 0; 
+  latitude: number = 0;
 }
 export interface SignUpForm {
   name: string;

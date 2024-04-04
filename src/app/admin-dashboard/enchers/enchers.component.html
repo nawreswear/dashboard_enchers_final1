@@ -1,0 +1,122 @@
+<app-header></app-header>
+<app-sidebar></app-sidebar>
+<div *ngIf="loading" class="loading-container">
+  <span class="spinner-border mr-2" role="status" aria-hidden="true"></span>
+  <span class="h5 mb-0 text-muted">Chargement des enchères...</span>
+</div>
+
+<h1 class="header">Gestion Enchères</h1>
+<button type="button" class="add" (click)="onCreate()" style=" font-style: normal;border-radius: 10px;margin-right: 20px;">
+  Ajouter Enchère
+</button>
+<div *ngIf="showAddForm" class="form-container">
+  <h2>Ajouter enchère</h2>
+  <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+    <div class="form-row">
+        <div class="form-group">
+          <label for="dateDebut">Date de début</label>
+          <input type="datetime-local" class="form-control" id="dateDebut" formControlName="dateDebut" required>
+        </div>
+        <div class="form-group">
+          <label for="dateFin">Date de fin</label>
+          <input type="datetime-local" class="form-control" id="dateFin" formControlName="dateFin" required>
+        </div>
+        <div class="form-group">
+          <label for="user">Numéro Participant</label>
+          <select class="form-control" id="parten" formControlName="parten" required>
+            <option *ngFor="let parten of partens" [value]="parten.id">{{ parten.id }}</option>
+          </select>
+        </div>
+      </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="edit-admin">Administrateur</label>
+          <select class="form-control" id="admin" formControlName="admin" required>
+            <option *ngFor="let admin of admins" [value]="admin.id">{{ admin.nom }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-articles">Articles</label>
+          <select multiple class="form-control" id="edit-articles" formControlName="articles" required>
+            <option *ngFor="let article of articles" [value]="article.id">{{ article.titre }}</option>
+          </select>
+        </div>
+      </div>
+    <div class="text-right">
+      <button type="submit"class="btn btn-success mr-2">Soumettre</button>
+      <button type="button"  class="btn btn-secondary" (click)="cancelCreation()">Fermer</button>
+    </div>
+  </form>
+</div>
+
+<div class="table-container">
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Date de début</th>
+        <th scope="col">Date de fin</th>
+        <th scope="col">Numéro admin</th>
+        <th scope="col">Numéro Participant</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let enchere of encheres">
+        <td>{{ enchere?.dateDebut ? formatDate(parseDate(enchere.dateDebut)) : '' }}</td>
+        <td>{{ enchere?.dateFin ? formatDate(parseDate(enchere.dateFin)) : '' }}</td>
+        
+        <td>{{ enchere.admin ? enchere.admin.id : 'Aucun administrateur associé' }}</td>
+
+        <td>{{ enchere?.parten?.id }}</td>
+        <td>
+          <button type="button" class="btn btn-edit" (click)="editEnchere(enchere)">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" class="btn btn-delete" (click)="enchere && enchere.id !== undefined && deleteEnchere(enchere.id)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="editMode"  class="form-containerr">
+  <h2>Modifier l'enchère</h2>
+  <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="card p-3">
+    <div class="form-row">
+    <div class="form-group">
+      <label for="edit-dateDebut">Date de début</label>
+      <input type="datetime-local" class="form-control" id="edit-dateDebut" formControlName="dateDebut" required>
+    </div>
+    <div class="form-group">
+      <label for="edit-dateFin">Date de fin</label>
+      <input type="datetime-local" class="form-control" id="edit-dateFin" formControlName="dateFin" required>
+    </div>
+    <div class="form-group">
+      <label for="edit-user">Numéro Participant</label>
+      <select class="form-control" id="edit-user" formControlName="user" required>
+        <option *ngFor="let user of partens" [value]="user.id">{{ user.id }}</option>
+      </select>
+    </div>
+    </div>
+    <div class="form-group">
+      <label for="edit-articles">Articles</label>
+      <select multiple class="form-control" id="edit-articles" formControlName="articles" required>
+        <option *ngFor="let article of articles" [value]="article.id">{{ article.titre }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="edit-admin">Administrateur</label>
+      <select class="form-control" id="edit-admin" formControlName="admin" required>
+        <option *ngFor="let admin of admins" [value]="admin.id">{{ admin.nom }}</option>
+      </select>
+    </div>
+    <div class="text-right">
+      <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
+      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+    </div>
+  </form>
+</div>

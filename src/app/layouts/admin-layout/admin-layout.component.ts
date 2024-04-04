@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/_service/auth.service';
+
+
 import { User } from 'src/app/interfaces/user';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -10,12 +12,12 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
   styleUrls: ['./admin-layout.component.css'],
 })
 export class AdminLayoutComponent {
-  avatarMenu: boolean = false;
+ /* avatarMenu: boolean = false;
   sideMenu: boolean = false;
   userData: User | null = null;
 
   constructor(
-    private authenticationService: AuthenticationService,
+    private authenticationService: AuthService,
     private toastrService: ToastrService,
     private router: Router
   ) {
@@ -30,7 +32,7 @@ export class AdminLayoutComponent {
   }
 
   doLogOut() {
-    this.authenticationService.logOut();
+    this.authenticationService.logout();
     this.toastrService.info('Loged out Successfully', 'Sign Out');
   }
 
@@ -41,5 +43,5 @@ export class AdminLayoutComponent {
   toggleSideMenu(): void {
     this.sideMenu = !this.sideMenu;
     console.log('this.sideMenu: ', this.sideMenu);
-  }
+  }*/
 }

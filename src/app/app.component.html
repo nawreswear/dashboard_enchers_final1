@@ -1,1 +1,18 @@
-<router-outlet></router-outlet>
+<div class="flex dark:bg-main-dark-bg">
+    <!-- Utilisez une seule condition pour afficher le sidebar et la navbar si l'utilisateur est connecté -->
+    <ng-container *ngIf="isAdmin()">
+      <app-sidebar></app-sidebar>
+      <div class="flex-1 min-h-[100vh]">
+        <app-header></app-header>
+        <router-outlet></router-outlet>
+      </div>
+    </ng-container>
+  
+    <!-- Contenu spécifique à la page de connexion -->
+    <ng-container *ngIf="!isAdmin()">
+      <div class="flex-1 min-h-[100vh]">
+        <router-outlet></router-outlet>
+      </div>
+    </ng-container>
+  </div>
+  

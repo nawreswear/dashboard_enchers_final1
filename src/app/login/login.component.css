@@ -1,3 +1,5 @@
+
+
 .card-container {
   width: 400px;
   margin-top: 50px;
@@ -9,17 +11,18 @@
 }
 
 body {
-  background-image: url('/assets/8b3b4007c21da39a6dde49d2be19c544.jpg'); /* Réglez l'image de fond */
+  background-image: url('/assets/8b3b4007c21da39a6dde49d2be19c544.jpg'); 
   background-color: #ccc;
  
-  background-position: center; /* Centrer l'image de fond */
+  background-position: center; 
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Utilisation de la hauteur de l'écran */
+  height: 100vh; 
   margin: 0;
   min-height: 100vh;
 }
+
 
 
 .profile-img-card {

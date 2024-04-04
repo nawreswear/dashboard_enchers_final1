@@ -1,58 +1,117 @@
-
 <div class="h-[90vh] relative">
   <!-- Grande image -->
-  <img src="assets/11.png" alt="Grande image" class="absolute inset-0 object-cover object-center w-full h-full">
-
-  <!-- Carousel -->
-  <app-carousel class="absolute inset-0"></app-carousel>
+  <div class="navbar-images">
+    <button (click)="previousImage()" class="nav-arrow">&#8249;</button>
+    <img [src]="categories[currentImageIndex].image" class="category-image" alt="Image de catégorie">
+    <h3 class="category-title">{{ categories[currentImageIndex].titre }}</h3>
+    <button (click)="nextImage()" class="nav-arrow">&#8250;</button>
 </div>
 
-
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
+  <!-- Carousel <app-carousel class="absolute inset-0"></app-carousel>-->
+</div>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
+ <!--<section *ngIf="relatedArticles.length > 0" class="px-4 bg-gray-100">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <span class="p-6 rounded-lg" *ngFor="let article of relatedArticles">
+        <img class="w-full h-48 object-cover object-center mb-4 rounded-full" [src]="article.photo" alt="Article">
+        <p class="article-title" style="text-align: center;">{{ article.titre }}</p>
+      </span>
+    </div>
+  </section>--> 
   <!-- category -->
-  <section aria-labelledby="category-heading" class="pt-24 sm:pt-32 xl:mx-auto xl:max-w-7xl xl:px-8">
+  <section aria-labelledby="category-heading" class="pt-24 sm:pt-32 xl:mx-auto xl:max-w-7xl xl:px-8" style="margin-bottom: 1%;">
     <div class="px-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8 xl:px-0">
-      <h2 id="category-heading" class="text-2xl font-bold tracking-tight text-gray-900">Shop by Category</h2>
-      <a routerLink="" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
+      <h2 id="category-heading" class="text-2xl font-bold tracking-tight text-gray-900" style="margin-top: 1%;">Shop by Category</h2>
+      <a routerLink="/categories" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
         Browse all categories
         <span aria-hidden="true"> &rarr;</span>
       </a>
     </div>
+  
+    <div class="mt-9 flow-root category-container">
+      <div class="relative box-content h-80 overflow-x-auto py-2" style="height: 0%;justify-content:space-around;">
+        <div class="min-w-screen-xl flex justify-between px-4 sm:px-6 lg:px-8">
+          <ng-container *ngFor="let category of categories.slice(0, 5); let i = index">
+            <div class="category-card" (mouseenter)="zoomIn($event)" (mouseleave)="zoomOut($event)" (click)="showRelatedArticles(category.id)">
+              <img class="category-card__image" [src]="category?.image || 'assets/category.png'" alt="">
+              <div class="category-card__content">
+                <span class="text-xl font-bold">{{category.titre}}</span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+   
+  
+  
+    <div class="mt-6 px-4 sm:hidden">
+      <a routerLink="/articles" class="block text-sm font-semibold text-indigo-600 hover:text-indigo-500">
+        Browse all categories
+        <span aria-hidden="true"> &rarr;</span>
+      </a>
+    </div>
+  </section >
 
-    <div class="mt-4 flow-root">
-      <div class="-my-2">
-        <div class="relative box-content h-80 overflow-x-auto py-2 ">
-          <div
-            class="min-w-screen-xl absolute flex space-x-8 px-4 sm:px-6 lg:px-8 xl:relative xl:grid xl:grid-cols-5 xl:gap-x-8 xl:space-x-0 xl:px-0">
+  <div class="row">
+    <div class="card-containerr">
+      <div class="cardd" *ngFor="let article of articles.slice(0, 4)">
+        <a routerLink="">
+        <img [src]="article.photo" class="card-img-top" alt="" style=" width: 30; height: 30;">
+        <div class="card-bodyy">
+          <h5 class="card-title">{{ article.titre }}</h5>
+          <div> Statut : {{ article.statut ? 'disponible' : 'Non disponible'}}</div>
+          <div> Quantité :<span>  {{ article.quantiter }} </span></div>
+          <div> Prix:<span class="article-price"> {{ article.prix }} Dt </span></div>
+          <div>Catégorie: <span class="article-price">{{ article.categorie.titre }}</span></div>
+          <div  class="edit-button-container">
+          <button class="primary" (click)="showArticleDetails(article)">Détail</button>
+          <button class="secondary" (click)="addToCart(article)"*ngIf="userType === 'user' || userType === 'vendeur'" class="secondary">
+            Add To cart
+           </button>
+        </div>
+        </div>
+        </a>
+      </div>
+    </div>
+</div>
+<div *ngIf="selectedArticle" class="article-details-container" style="margin-bottom: 5px; margin-left:15%;width:60%;height: 20%;">
+  <h1 style="text-align: center;">{{ selectedArticle.titre }}</h1>
+  <span><img [src]="selectedArticle.photo" alt="" style="width:10;height:10;">
+    {{ selectedArticle.description }}
+    Prix:<span class="article-price">  {{ selectedArticle.prix }} Dt</span>
+    Livrable:<span class="article-price">  {{ selectedArticle.livrable ? 'Oui' : 'Non' }}</span>
+    Quantiter: {{ selectedArticle.quantiter}}
+    Statut: {{ selectedArticle.statut}}
+    Categorie: {{ selectedArticle.categorie.titre }}
+  </span><p> </p>
+  <button class="delete-button" style="background-color: red;margin-top: 1px; border-radius: 8px;" (click)="closeArticleDetails()">Fermer</button>
+</div>
 
-            <ng-container *ngFor="let category of categories; let i = index">
-              <a routerLink=""
-                class="relative flex h-80 w-56 flex-col overflow-hidden rounded-lg p-6 hover:opacity-75 xl:w-auto"
-                *ngIf="i<5">
+<div><!--class="container"-->
+  <h1 class="page-title text-center">Les Enchères</h1>
+  <div class="row">
+    <div class="col-md-4" *ngFor="let enchere of encheres">
+      <div class="card auction-card">
+        <div class="card-body">
+          <p class="card-text auction-date">Date de début : {{ enchere.dateDebut ? formatDate(parseDate(enchere.dateDebut)) : '' }}</p>
+          <p class="card-text auction-date">Date de fin : {{ enchere.dateFin ? formatDate(parseDate(enchere.dateFin)) : '' }}</p>
+          <!-- Vérifier si enchere.id est défini avant d'appeler getArticlesForEnchere(enchere.id) -->
+          <div *ngIf="enchere.id !== undefined && getArticlesForEnchere(enchere.id)">
+            <!-- Utilisation de ng-container pour boucler sur les articles -->
+            <ng-container *ngFor="let article of getArticlesForEnchere(enchere.id)">
+              <div style="display: inline-block; margin-right: 10px;">
+              <div>{{ article.titre }}</div>
+              <img [src]="article.photo" alt="Photo de l'article" width="100" height="100" style="border-radius: 20%;">
 
-                <span aria-hidden="true" class="absolute inset-0">
-                  <img [src]="category.image || 'assets/category.png'" alt=""
-                    class="h-full w-full object-cover object-center">
-                </span>
-                <span aria-hidden="true"
-                  class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-800 opacity-50"></span>
-                <span class="relative mt-auto text-center text-xl font-bold text-white">{{category.name}}</span>
-              </a>
+              <div> Prix départ: {{ article.prix }} Dt</div>
+            </div>
             </ng-container>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="mt-6 px-4 sm:hidden">
-      <a routerLink="" class="block text-sm font-semibold text-indigo-600 hover:text-indigo-500">
-        Browse all categories
-        <span aria-hidden="true"> &rarr;</span>
-      </a>
-    </div>
-  </section>
-
+  </div>
 </div>
 
 <!-- Perks -->
@@ -121,4 +180,5 @@
       </div>
     </div>
   </section>
+
 </div>

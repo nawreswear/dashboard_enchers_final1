@@ -1,0 +1,36 @@
+<app-header></app-header>
+<app-sidebar></app-sidebar>
+<div class="all" > 
+      <div class="header">
+        <h1  style="font-style: normal;">Liste Demandes Vendeurs</h1>
+    </div>
+<table class="table table-striped"class="table table-striped custom-table">
+   <thead>
+      <tr>      
+        <th>Date</th>
+        <th>Etat</th>
+        <th>nom </th>
+        <th> Prenom</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let demande of demandesvendeurs">     
+        <td>{{ demande.datedem | date: 'dd/MM/yyyy HH:MM:SS' }}</td>
+        <td>
+          {{ demande.etatdem ? 'Accepté' : 'En attente' }}
+        </td> 
+        <td>{{ demande.user.nom }} </td>
+        <td>{{ demande.user.prenom }}</td> 
+        <td *ngIf="!demande.etatdem"> <!-- Afficher les boutons seulement si l'état est false -->
+          <button class="btn btn-edit" (click)="approuverDemande(demande)">Approve</button>
+          <button class="btn btn-delete" (click)="rejeterVendeur(demande)">Reject</button>
+        </td>
+        <td *ngIf="demande.etatdem"> <!-- Afficher une cellule vide si l'état est true -->
+          <!-- Vous pouvez également afficher un message indiquant que la demande est déjà approuvée -->
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div> 

@@ -12,12 +12,26 @@ interface Categorie {
   image: string; 
 }
 
+interface Article {
+  id: number;
+  titre: string;
+  description: string;
+  photo: string;
+  prix: string;
+  livrable: boolean;
+  statut: string; 
+  quantiter: number;
+}
+
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.css']
 })
 export class CategoriesComponent implements OnInit {
+  public categoryArticles: Article[] = [];
+  public selectedCategory: Categorie | null = null; // Correction
+
   displayedColumns = ['title', 'description', 'image', 'actions'];
   public myForm!: FormGroup;
   public editMode: boolean = false;
@@ -25,7 +39,7 @@ export class CategoriesComponent implements OnInit {
   public editCat: Categorie | null = null;
   public loading: boolean = false;
   public imageUrl: string = '';
-   urlPattern = new RegExp('^(https?:\\/\\/)?'+ // Protocole
+  urlPattern = new RegExp('^(https?:\\/\\/)?'+ // Protocole
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // Nom de domaine
   '((\\d{1,3}\\.){3}\\d{1,3}))'+ // Ou une adresse IP (v4) 
   '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // Port et chemin
@@ -43,7 +57,7 @@ onCreatee = false;
     private formBuilder: FormBuilder,
     private catService: CategoriesService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,private categoriesService:CategoriesService
 ) {
   this.myForm = this.formBuilder.group({
     titre: ['', Validators.required],
@@ -56,6 +70,37 @@ onCreatee = false;
       image: ['', Validators.required]
   });
 }
+public getArticlesForSelectedCategory(categoryId: number) {
+  this.loading = true;
+  this.categoriesService.getArticlesForCategory(categoryId).subscribe(
+      (articles: Article[]) => {
+          // Mettez à jour les articles de la catégorie sélectionnée
+          this.categoryArticles = articles;
+          this.loading = false;
+      },
+      (error: HttpErrorResponse) => {
+          console.error('Error fetching articles for category:', error);
+          this.loading = false;
+          this.snackBar.open('Error loading articles for category!', 'Close', {
+              duration: 3000
+          });
+      }
+  );
+}
+
+
+// Méthode pour afficher les détails de la catégorie sélectionnée et récupérer ses articles associés
+public showCategoryDetails(category: Categorie) {
+  // Si la catégorie cliquée est déjà la catégorie sélectionnée, réinitialisez la sélection
+  if (this.selectedCategory === category) {
+    this.selectedCategory = null;
+  } else {
+    // Sinon, affichez les détails de la catégorie et récupérez les articles associés
+    this.selectedCategory = category;
+    this.getArticlesForSelectedCategory(category.id);
+  }
+}
+
   ngOnInit() {
     this.getAllCategories(); // Fetch categories on initialization
   }
@@ -225,11 +270,16 @@ onCreate() {
   }  
   
   isValidURL(url: string): boolean {
-    // Expression régulière pour valider les URL d'images Bing
-    const bingImageURLPattern = new RegExp('^(https?:\\/\\/)?([a-z0-9-]+\\.)*bing\\.com\\/images\\/search.*', 'i');
-    // Test si l'URL correspond au modèle d'URL d'image Bing
-    return bingImageURLPattern.test(url);
-  }
+    // Vérifie si l'URL est vide
+    if (!url) {
+        return false;
+    }
+
+    // Expression régulière pour valider les URL
+    const urlPattern = new RegExp('^https?://.*', 'i');
+    // Test si l'URL correspond au modèle d'URL
+    return urlPattern.test(url);
+}
   
   cancelEdit() {
     this.editMode = false; // Quitte le mode édition

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
-const API_URL = 'http://localhost:3003/';
 
 
 const USER_KEY = 'auth-user';
@@ -11,23 +11,20 @@ const USER_KEY = 'auth-user';
 })
 export class UserService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
-  getPublicContent(): Observable<any> {
-    return this.http.get(API_URL + 'all', { responseType: 'text' });
+   // Fonction pour rediriger l'utilisateur vers le tableau de bord approprié
+   redirectToDashboardByType(type: string): void {
+    if (type === 'user') {
+      this.router.navigate(['/user-dashboard']);
+    } else if (type === 'vendeur') {
+      this.router.navigate(['/vendeur-dashboard']);
+    } else if (type === 'admin') {
+      this.router.navigate(['/admin-dashboard']);
+    } else {
+      // Gérer d'autres types d'utilisateur ou erreur
+      console.error('Type d\'utilisateur non pris en charge');
+    }
   }
-
-  getUserBoard(): Observable<any> {
-    return this.http.get(API_URL + 'users', { responseType: 'text' });
-  }
-
-  getVendeurBoard(): Observable<any> {
-    return this.http.get(API_URL + 'vendeur', { responseType: 'text' });
-  }
-
-  getAdminBoard(): Observable<any> {
-    return this.http.get(API_URL + 'admin', { responseType: 'text' });
-  }
-  
   
 }

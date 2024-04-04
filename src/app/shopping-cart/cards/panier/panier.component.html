@@ -1,0 +1,35 @@
+<div class="card bg-dark text-white mb-3" style="max-width: 50rem;" id="htmlData">
+  <div class="card-header text-center">Panier</div>
+  <div class="card-body">
+    <table class="table table-dark">
+      <thead>
+        <tr>
+          <th scope="col">Titre</th>
+          <th scope="col">Quantité</th>
+          <th scope="col">Prix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let article of panier.articles">
+          <td>{{ article.titre }}</td>
+          <td>{{ article.quantiter }}</td>
+          <td>{{ article.prix }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Total:</td>
+          <td style="font-weight: bold">{{ panier.totalP }} DT</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="d-flex justify-content-end">
+      <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3" [disabled]="panier.articles.length === 0">
+        Payer
+      </button>
+      <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3 ms-3" (click)="openPDF()" [disabled]="panier.articles.length === 0">
+        Imprimer le PDF
+      </button>
+    </div>
+  </div>
+</div>

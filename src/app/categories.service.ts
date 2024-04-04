@@ -1,11 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';// Import your Categorie model
+
 interface Categorie {
   id: number; // Assurez-vous que le type correspond à votre base de données
   titre: string;
   description: string;
   image: string;
+}
+interface Article {
+  id: number;
+  titre: string;
+  description: string;
+  photo: string;
+  prix: string;
+  livrable: boolean;
+  statut: string; 
+  quantiter: number;
 }
 @Injectable({
   providedIn: 'root'
@@ -19,7 +30,9 @@ export class CategoriesService {
   getAllCategories(): Observable<Categorie[]> {
     return this.http.get<Categorie[]>(`${this.baseUrl}/getallcategories`);
   }
-
+  getArticlesForCategory(categoryId: number): Observable<Article[]> {
+    return this.http.get<Article[]>(`${this.baseUrl}/${categoryId}/articles`);
+  }
   getCategoryById(id: string): Observable<Categorie> {
     return this.http.get<Categorie>(`${this.baseUrl}/getcategorieById/${id}`);
   }
@@ -38,4 +51,8 @@ export class CategoriesService {
 
   deleteAllCategories(): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/deleteAllCategories`); 
-  }}
+  }
+ /* getArticlesForCategory(categoryId: number): Observable<Article[]> {
+    return this.http.get<Article[]>(`${this.baseUrl}/categories/${categoryId}/articles`);
+  }*/
+}

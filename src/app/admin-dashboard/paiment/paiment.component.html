@@ -1,0 +1,41 @@
+<app-header></app-header>
+<app-sidebar></app-sidebar>
+<h1 style=" margin-top: -73rem; font-weight: lighter;
+  font-size: 24px;
+  margin-bottom: 20px;
+  margin-left: 10%;  position: absolute; /* Position absolue pour centrer le titre */
+  left: 45%; /* Position horizontale au milieu de la page */
+  transform: translate(-50%, -50%); /* Déplacement de -50% de la largeur et de la hauteur du titre pour le centrer */
+  font-family: Arial, Helvetica, sans-serif; /* Famille de police */
+  font-size: 24px; /* Taille du texte */
+  color: #000000; /* Couleur du texte */">Liste des paiements</h1>
+    <div  class="container"> 
+    <table class="table"  style="margin-top: 15px;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Date</th>
+          <th>Panier</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let paiement of paiements">
+          <td>{{ paiement.id }}</td>
+          <td>{{ paiement.montant }}</td>
+          <td>{{ paiement.statut }}</td>
+          <td>{{ paiement.date | date: 'short' }}</td>
+          <td>
+        <div *ngIf="paiement.panier">
+              <p><strong>ID:</strong> {{ paiement.panier.id }}</p>
+              <p><strong>Total:</strong> {{ paiement.panier.totalP }}</p>
+              <p><strong>Date:</strong> {{ paiement.panier.date | date: 'short' }}</p>
+              <p><strong>Utilisateur:</strong> {{ paiement.panier.user?.nom }} {{ paiement.panier.user?.prenom }}</p>
+              <p><strong>Ligne de panier:</strong></p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>

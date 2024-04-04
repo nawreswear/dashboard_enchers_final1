@@ -1,0 +1,95 @@
+
+/* Style du conteneur de tableau */
+.container{
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding: 40px;
+  padding-bottom: 10%;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: hsl(0, 0%, 100%);
+  width: 1200px;
+  margin-left: 70px;
+  height: 90%;
+}
+@media (min-width: 768px) {
+  .row {
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Adjust for wider screens */
+  }
+}
+@media (max-width: 767px) {
+  .row {
+      grid-template-columns: 1fr;  /* Stack cards vertically on small screens */
+  }
+
+  .card {
+      margin-bottom: 1rem;  /* Adjust spacing for vertical layout */
+  }
+}
+/* Media queries (unchanged) */
+
+.row {
+  display: grid; /* Base layout for all screen sizes */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));  /* Adjust card width */
+  grid-gap: 2rem;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Typography */
+.page-title {
+  font-family: 'Open Sans', sans-serif; /* Example font */
+  font-size: 1.5rem; /* Increased size for prominence */
+  font-weight: 600;
+  color: #343a40; /* Adjust as needed */
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.card-text {
+  font-family: 'Lato', serif; /* Example font */
+  font-size: 1rem;
+  color: #6c757d; /* Adjust as needed */
+}
+/* Button styling */
+.btn-primary {
+    background-color: #007bff; /* Primary brand color */
+    border: none;
+    border-radius: 5px; /* Slight rounding */
+    color: #fff;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #0062cc; /* Adjust for hover effect */
+}
+
+/* Badge styling */
+.badge-warning {
+    background-color: #ffe08c; /* Lighter warning color */
+    color: #212529; /* Ensure text contrast */
+    border-radius: 5px;
+}
+.auction-image-wrapper {
+  margin-bottom: 1rem;  /* Add space below image */
+}
+
+.img-fluid {
+  width: 100%;  /* Make image responsive */
+  height: auto;
+}

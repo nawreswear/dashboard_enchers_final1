@@ -1,0 +1,27 @@
+<div class="container">
+  <h2 class="page-title text-center">Les Enchères Planifiées</h2>
+  <div class="row">
+    <div class="col-md-4" *ngFor="let enchere of encheres">
+      <div class="card auction-card">
+        <div class="card-body">
+          <p class="card-text auction-date">Date de début : {{ enchere.dateDebut ? formatDate(parseDate(enchere.dateDebut)) : '' }}</p>
+          <p class="card-text auction-date">Date de fin : {{ enchere.dateFin ? formatDate(parseDate(enchere.dateFin)) : '' }}</p>
+          <!-- Vérifier si enchere.id est défini avant d'appeler getArticlesForEnchere(enchere.id) -->
+          <div *ngIf="enchere.id !== undefined && getArticlesForEnchere(enchere.id)">
+            <!-- Utilisation de ng-container pour boucler sur les articles -->
+            <ng-container *ngFor="let article of getArticlesForEnchere(enchere.id)">
+              <div style="display: inline-block; margin-right: 10px;">
+              <div>{{ article.titre }}</div>
+              <img [src]="article.photo" alt="Photo de l'article" width="100" height="100" style="border-radius: 20%;">
+
+              <div> Prix départ: {{ article.prix }} Dt</div>
+            </div>
+            </ng-container>
+          </div>
+          <button *ngIf="enchere.id !== undefined" (click)="findUserIdAndParticipateEnchere(enchere.id)" class="btn btn-primary" style="text-align:center;margin-top: 5px;">Participer</button>
+          <span *ngIf="enchere.id === undefined" class="badge badge-warning text-dark">ID d'enchère non défini</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

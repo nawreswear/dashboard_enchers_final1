@@ -1,13 +1,13 @@
 export interface Category {
-  createdAt?: string;
-  image?: string;
-  name: string;
-  slug?: string;
-  updatedAt?: string;
+  id: number;
+  titre: string;
+  description: string;
+  image: string;
   _id?: string;
 }
 
-export interface CategoryForm {
-  name: string;
-  image?: string;
+export interface CategoryForm { 
+  titre: string;
+  description: string;
+  image: string;
 }
