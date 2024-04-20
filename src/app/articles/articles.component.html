@@ -1,4 +1,4 @@
-
+<app-navbar></app-navbar>
 <div class="row">
   <!-- Assurez-vous que authService.isLoggedIn() renvoie true lorsque l'utilisateur est connecté -->
   <div *ngIf="authService.isLoggedIn()" class="flex items-center space-x-4" style="margin-top: 5px; margin-left: 5px;">
@@ -8,15 +8,15 @@
   </div>
   <div class="card-container">
     <div class="card" *ngFor="let article of articles">
-      <img [src]="article.photo" class="card-img-top" alt="" style="margin-top: 5px; margin-left: 40px; width: 50%; height: 30%;">
+      <img [src]="article.photo" alt="" style="margin-top: 5px; margin-left: 40px; width: 40%; height: auto;">
       <div class="card-body">
-        <h5 class="card-title">{{ article.titre }}</h5>
-        <p>{{ article.description }}</p>
-        <div> Statut : {{ article.statut ? 'disponible' : 'Non disponible'}}</div>
-        <div> Quantité :<span>  {{ article.quantiter }} </span></div>
-        <div> Prix:<span class="article-price"> {{ article.prix }} Dt </span></div>
-        <div> Prix De Vente:<span class="article-price"> {{ article.prixvente }} Dt </span></div>
-        <div>Catégorie: <span class="article-price">{{ article.categorie.titre }}</span></div>
+        <h5 class="card-title">{{ article?.titre }}</h5>
+        <p>{{ article?.description }}</p>
+        <div> Statut : {{ article?.statut ? 'disponible' : 'Non disponible'}}</div>
+        <div> Quantité :<span>  {{ article?.quantiter }} </span></div>
+        <div> Prix:<span class="article-price"> {{ article?.prix }} Dt </span></div>
+        <div> Prix De Vente:<span class="article-price"> {{ article?.prixvente }} Dt </span></div>
+        <div>Catégorie: <span class="article-price">{{ article?.categorie?.titre }}</span></div>
         <div  class="edit-button-container">
         <button class="primary" (click)="showArticleDetails(article)">Détail</button>
         <button class="secondary" (click)="addToCart(article)">
@@ -91,7 +91,7 @@
       <div class="form-group col-md-9">
         <label for="categorie">Catégorie</label>
         <select class="form-control" id="categorie" formControlName="categorie" >
-          <option *ngFor="let categorie of categories" [value]="categorie.id">{{ categorie.titre }}</option>
+          <option *ngFor="let categorie of categories" [value]="categorie?.id">{{ categorie?.titre }}</option>
         </select>
       </div>
       </div>

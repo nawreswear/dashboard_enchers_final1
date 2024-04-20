@@ -60,7 +60,6 @@
                         <label for="type">Type</label>
                         <select class="form-control" name="type" [(ngModel)]="form.type" required #type="ngModel">
                             <option value="admin">Admin</option>
-                            <option value="vendeur">Vendeur</option>
                             <option value="user">User</option>
                         </select>
                         <div *ngIf="f.submitted && type.invalid" class="alert alert-danger">

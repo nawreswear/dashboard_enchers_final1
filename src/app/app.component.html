@@ -1,18 +1,9 @@
 <div class="flex dark:bg-main-dark-bg">
-    <!-- Utilisez une seule condition pour afficher le sidebar et la navbar si l'utilisateur est connecté -->
-    <ng-container *ngIf="isAdmin()">
-      <app-sidebar></app-sidebar>
-      <div class="flex-1 min-h-[100vh]">
-        <app-header></app-header>
-        <router-outlet></router-outlet>
-      </div>
-    </ng-container>
-  
-    <!-- Contenu spécifique à la page de connexion -->
-    <ng-container *ngIf="!isAdmin()">
-      <div class="flex-1 min-h-[100vh]">
-        <router-outlet></router-outlet>
-      </div>
-    </ng-container>
+  <div class="flex-1 min-h-[100vh]">
+    <!-- Afficher le navbar pour les utilisateurs non connectés ou les utilisateurs non administrateurs, sauf sur les pages du tableau de bord de l'administrateur -->
+    <app-navbar *ngIf="!isLoginOrSignup() && !isAdmin && !isOnAdminDashboard()"></app-navbar>
+
+    <!-- Afficher le contenu spécifique à la page de connexion ou le reste du contenu -->
+    <router-outlet></router-outlet>
   </div>
-  
+</div>

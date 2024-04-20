@@ -41,6 +41,7 @@ nav ul li a {
   display: flex;
   flex-wrap: wrap;
   justify-content:start;
+  height: 10%; 
 }
 
 .card {
@@ -119,6 +120,7 @@ nav ul li a {
 }
 
 .card-body {
+  height: 1%;
   padding: 25px; /* Espacement augmenté pour une meilleure lisibilité */
 }
 

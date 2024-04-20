@@ -24,14 +24,14 @@ export interface Article {
   photo: string;
   description: string;
   quantiter: number;
-  prix: number;
+  prix: number; 
   livrable: boolean;
   statut: string;
-  prixinitial: number;
   prixvente: number;
   vendeur: { id: number };
   categorie: Categorie;
 }
+
 
 export interface Categorie {
   id: number; 
@@ -50,7 +50,6 @@ export interface Paiement {
 providedIn: 'root'
 })
 export class PanierService {
-  private apiURL2 = "http://localhost:3004/lignepanier";
   private apiURL = "http://localhost:3004/panier";
   httpOptions = {
   headers: new HttpHeaders({
@@ -60,6 +59,11 @@ export class PanierService {
 constructor(private httpClient: HttpClient) { }
 addPanier(panier: Panier): Observable<Panier> {
   return this.httpClient.post<Panier>(`${this.apiURL}/addPanier`, panier, this.httpOptions);
+}
+addToCart(article: Article, panierId: number): Observable<string> {
+  const url = `${this.apiURL}/addToCart`;
+  const body = { article, panierId };
+  return this.httpClient.post<string>(url, body);
 }
 
 getAllPaniers(): Observable<Panier[]> {
@@ -81,7 +85,5 @@ deletePanier(id: number): Observable<string> {
 calculerMontantTotal(): Observable<number> {
   return this.httpClient.get<number>(`${this.apiURL}/calculerMontantTotal`);
 }
-getLignePanierById(id: number): Observable<any> {
-    return this.httpClient.get<any>(`${this.apiURL2}/getLignePanierById/${id}`);
-  }
+
 }

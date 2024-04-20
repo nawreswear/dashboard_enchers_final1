@@ -4,10 +4,12 @@ import { EnchersServiceService } from '../enchers-service.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ArticleService } from '../article.service';
-import {  BehaviorSubject, Subject,of } from 'rxjs';
+import {  BehaviorSubject, Observable, Subject,of } from 'rxjs';
 import { User } from '../interfaces/user';
 import { Router } from '@angular/router';
 import { AuthService  } from '../_service/auth.service';
+import { PartEnService } from '../part-en.service';
+import { CookieService } from 'ngx-cookie-service';
 interface Enchere {
   id?: number;
   dateDebut: string;
@@ -15,16 +17,18 @@ interface Enchere {
   parten: { id: number };
   admin: { id: number };
   articles: { id: number }[];
-  meetingId?: string; 
 }
+
 interface Article {
   id: number;
   titre: string;
   description: string;
   photo: string;
+  prixvente?: number;
   prix: string;
  // livrable: boolean;
   statut: string; 
+  showPriceForm?: boolean;
  // quantiter: number;
 
 }
@@ -37,10 +41,10 @@ let enchereData: Enchere[] = [];
 export class EnchersuserComponent implements OnInit {
   token = new BehaviorSubject<string | null>(null);
   tokenObs$ = this.token.asObservable();
-
+  article: any;
   userData = new BehaviorSubject<User | null>(null);
   userDataObs$ = this.userData.asObservable();
-
+  selectedEnchereId: number | undefined;
   urlPattern = new RegExp('^(https?:\\/\\/)?'+ // Protocole
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // Nom de domaine
   '((\\d{1,3}\\.){3}\\d{1,3}))'+ // Ou une adresse IP (v4) 
@@ -52,7 +56,7 @@ export class EnchersuserComponent implements OnInit {
 // Déclaration de la fonction dans la classe de composant
 parseDate(dateString: string): number | undefined {
   return parseInt(dateString, 10); // Convertit la chaîne en nombre entier
-}
+} // Déclarer le formulaire
 
   public myForm!: FormGroup;
   public encheres: Enchere[] = []; // Utiliser le bon type Enchere[]
@@ -62,20 +66,23 @@ parseDate(dateString: string): number | undefined {
   public editForm!: FormGroup;
   public partens: any[] = [];
   public admins: any[] = [];
+  public prixVenteForm!: FormGroup;
+  public selectedArticleId: number | undefined;
+  public showAddPriceForm: boolean = false;
+
   public showAddForm: boolean = false; 
   public formattedDateDebut!: string;
   public formattedDateFin!: string;
   private unsubscribe$ = new Subject<void>();
   public articlesForEnchere: Article[] = [];
   public articlesForEnchereMap: { [enchereId: number]: Article[] } = {};
- // Déclarez la propriété isLoggedInSubject avec la bonne visibilité
  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
  authStatus = this.isLoggedInSubject.asObservable();
-  constructor(
+  constructor(private cookieService: CookieService,
     private formBuilder: FormBuilder,
     private encherService: EnchersServiceService,
     private snackBar: MatSnackBar,  public router: Router,private authService: AuthService  ,
-   private articleService: ArticleService
+   private articleService: ArticleService,private partenservice:PartEnService
   ) {
     this.myForm = this.createEnchereForm();
     this.editForm = this.createEnchereForm();
@@ -85,7 +92,10 @@ parseDate(dateString: string): number | undefined {
       dateDebut: [new Date()],
       parten: ['', Validators.required], 
       admin: ['', Validators.required], 
-      articles: this.formBuilder.control([]) // Utilisez control au lieu de array
+      articles: this.formBuilder.control([]) 
+    });
+    this.prixVenteForm = this.formBuilder.group({
+      prixvente: ['', Validators.required] 
     });
     
     this.editForm = this.formBuilder.group({
@@ -120,7 +130,11 @@ parseDate(dateString: string): number | undefined {
     this.tokenObs$.subscribe(token => {
       if (!token) this.router.navigate(['/']);
     });
+    this.prixVenteForm = this.formBuilder.group({
+      prixvente: [null, Validators.required] // Initialisez avec null ou une valeur par défaut
+    });
 }
+
 createEnchereForm(): FormGroup {
   return this.formBuilder.group({
     id: [0],
@@ -140,7 +154,7 @@ public getArticlesForEnchere(enchereId: number): Article[] | undefined {
     this.encherService.getArticlesForEnchere(enchereId).subscribe(
       (articles: Article[]) => {
         this.articlesForEnchereMap[enchereId] = articles;
-        console.log("Articles pour l'enchère avec ID", enchereId, ":", this.articlesForEnchereMap[enchereId]);
+       // console.log("Articles pour l'enchère avec ID", enchereId, ":", this.articlesForEnchereMap[enchereId]);
       },
       (error) => {
         console.error('Une erreur s\'est produite lors de la récupération des articles de l\'enchère avec ID', enchereId, ':', error);
@@ -150,7 +164,6 @@ public getArticlesForEnchere(enchereId: number): Article[] | undefined {
     return undefined;
   }
 }
-
 getArticlePhoto(articleId: number): string {
   const article = this.articles.find(article => article.id === articleId);
   return article ? article.photo : ''; // Retourne l'URL de la photo de l'article ou une chaîne vide si l'article n'est pas trouvé
@@ -186,12 +199,14 @@ findUserIdAndParticipateEnchere(enchereId: number) {
 participerEnchere(userId: number, enchereId: number) {
   this.encherService.participateInEnchere(userId, enchereId).subscribe(
     () => {
+      this.cookieService.set('userId', userId.toString());
+      const userIdd = parseInt(this.cookieService.get('userId') || '0');
+      console.log("ID de l'utilisateur:", userIdd);
       // Mettez à jour les données après la participation à l'enchère
       this.getAllEncheres(); // Met à jour la liste des enchères après la participation
-      /* Affichez un message de succès à l'utilisateur
       this.snackBar.open('Vous avez participé à l\'enchère avec succès!', 'Fermer', {
         duration: 3000
-      });*/
+      });
     },
     (error: HttpErrorResponse) => {
       if (error.status !== 200) {
@@ -208,10 +223,7 @@ participerEnchere(userId: number, enchereId: number) {
     }
   );
 }
-joinMeeting(meetingId: string) {
-  // Rediriger vers le composant des détails de la réunion en ligne avec l'identifiant de la réunion
-  this.router.navigate(['/meeting-details', meetingId]);
-}
+
   ngOnInit() {
     this.getAllEncheres();
     this.getAllArticles();
@@ -229,16 +241,13 @@ joinMeeting(meetingId: string) {
 
   formatDate(timestamp: number | undefined): string {
     if (!timestamp) return ''; // Si le timestamp est indéfini, retourne une chaîne vide
-
     const date = new Date(timestamp); // Crée une nouvelle instance de Date à partir du timestamp
-
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    return `${year}-${month}-${day} T ${hours}:${minutes}`;
+    return `${year}-${month}-${day}  ${hours}:${minutes}`;
 }
 
 isLoggedIn(): boolean {
@@ -290,7 +299,6 @@ getAllArticles() {
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching admins:', error);
-        // Gérer les erreurs si nécessaire
       }
     );
   }
@@ -423,8 +431,13 @@ getAllArticles() {
     });
   }
   
-  
-  
+  // Méthode pour afficher ou masquer le formulaire d'ajout du prix de vente
+toggleAddPriceForm(articleId: number | undefined) {
+    if (articleId !== undefined) {
+        this.showAddPriceForm = true; // Afficher le formulaire de prix de vente
+        this.selectedArticleId = articleId;
+    }
+}
   deleteEnchere(id: number) {
     // Appelez le service pour supprimer l'enchère
     this.encherService.deleteEnchere(id).subscribe(
@@ -456,5 +469,69 @@ getAllArticles() {
     // Expression régulière pour valider les URL
     const urlPattern = new RegExp('^(https?:\\/\\/)?([a-z0-9-]+\\.)+[a-z]{2,}([\\/\\?#].*)?$', 'i');
     return urlPattern.test(url);
+  }
+  getParticipantId(enchereId: number): Observable<number> {
+    return this.partenservice.getPartenIdByEnchere(enchereId);
+  }
+  addPrixVenteForArticle(enchereId: number, articleId: number) {
+    if (this.prixVenteForm.valid) {
+      // Obtenez le contrôle de prix de vente du formulaire
+      const prixVenteControl = this.prixVenteForm.get('prixvente');
+      if (prixVenteControl) {
+        // Obtenez la valeur du prix de vente du contrôle
+        const prixVenteValue = prixVenteControl.value.toString(); // Convertir en chaîne de caractères
+        const prixVente = parseFloat(prixVenteValue.replace(',', '.')); // Assurez-vous que les décimales sont correctement formatées
+        
+        if (!isNaN(prixVente)) { // Vérifiez si la conversion a réussi
+          // Appelez la méthode pour obtenir l'ID du participant
+          this.getParticipantId(enchereId).subscribe(
+            (participantId: number) => {
+              // Appelez le service pour ajouter le prix de vente pour l'article
+              this.articleService.addPrixVenteForArticle(enchereId, articleId, prixVente).subscribe(
+                () => {
+                  // Enregistrez l'ID du participant dans une cookie
+                  this.cookieService.set('participantId', participantId.toString());
+                // Réinitialisez le formulaire et masquez le formulaire de prix de vente
+                  this.prixVenteForm.reset();
+                  this.showAddPriceForm = false;
+
+                  // Mettre à jour la liste d'enchères après l'ajout du prix de vente
+                  this.updateEncheresAfterPrixVente();
+                }, // Utiliser bind pour conserver le contexte de this
+                () => {
+                  // Affichez un message d'erreur en cas d'échec de l'ajout du prix de vente
+                  this.snackBar.open('Le prix de vente a été ajouté avec succès.', 'Fermer', {
+                    duration: 3000
+                  });
+                }
+              );
+            },
+            (error) => {
+              console.error("Erreur lors de la récupération de l'ID du participant :", error);
+              // Affichez un message d'erreur si la récupération de l'ID du participant échoue
+              this.snackBar.open("Erreur lors de la récupération de l'ID du participant.", 'Fermer', {
+                duration: 3000
+              });
+            }
+          );
+        } else {
+          // Affichez un message d'erreur si le prix de vente n'est pas valide
+          console.error("La valeur du prix de vente n'est pas un nombre valide :", prixVenteValue);
+          this.snackBar.open("Veuillez saisir un prix de vente valide.", 'Fermer', {
+            duration: 3000
+          });
+        }
+      }
+    } else {
+      // Affichez un message d'avertissement si le formulaire de prix de vente n'est pas valide
+      console.log("Le formulaire de prix de vente n'est pas valide.");
+      this.snackBar.open("Le formulaire de prix de vente n'est pas valide.", 'Fermer', {
+        duration: 3000
+      });
+    }
+  }
+  updateEncheresAfterPrixVente() {
+    // Appelez ici la méthode pour mettre à jour la liste d'enchères après avoir ajouté le prix de vente
+    this.getAllEncheres();
   }
 }

@@ -33,6 +33,30 @@
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));  /* Adjust card width */
   grid-gap: 2rem;
 }
+/* Style for the form */
+.prix-vente-form {
+  margin-top: 20px; /* Adjust margin as needed */
+}
+
+/* Style for the label */
+.prix-vente-label {
+  font-weight: bold;
+}
+
+/* Style for the input field */
+.prix-vente-input {
+  width: 20%; /* Make the input field full width */
+  padding: 8px; /* Add padding for better appearance */
+  border: 1px solid #ccc; /* Add border */
+  border-radius: 4px; /* Add border radius */
+}
+
+/* Style for the error message */
+.prix-vente-error {
+  color: #dc3545; /* Error message color */
+  font-size: 0.8em; /* Adjust font size */
+  margin-top: 5px; /* Adjust margin as needed */
+}
 
 .card {
   background-color: #fff;

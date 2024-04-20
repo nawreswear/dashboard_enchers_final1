@@ -46,7 +46,7 @@ export class ArticleService {
     return this.http.post<Article>(`${this.baseUrl}/addArticle`, data); 
   }
 
-
+  
   updateArticle(id: string, data: Article): Observable<Article> {
     return this.http.put<Article>(`${this.baseUrl}/UpdateArticle/${id}`, data);
   }

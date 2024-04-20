@@ -52,6 +52,7 @@ import { PaimentComponent } from './admin-dashboard/paiment/paiment.component';
 import { PanierComponent } from './shopping-cart/cards/panier/panier.component';
 import { CardsComponent } from './shopping-cart/cards/cards.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { PartEnComponent } from './admin-dashboard/part-en/part-en.component';
 
 
 const routes: Route[] = [
@@ -100,7 +101,7 @@ const routes: Route[] = [
       { path: 'categorie', component: CategoriesAdminComponent },
       { path: 'demande-vendeur', component: DemandevendeurAdminComponent}, 
       { path: 'paiment', component: PaimentComponent},
-
+      { path: 'parten', component: PartEnComponent},
 ];
 
 @NgModule({
@@ -149,6 +150,7 @@ const routes: Route[] = [
     PaimentComponent,
     PanierComponent,
     CardsComponent,
+    PartEnComponent,
   ],
   imports: [
     MatSnackBarModule,

@@ -1,30 +1,55 @@
-import { Component } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms'; // Importez FormBuilder si vous utilisez des formulaires réactifs
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AuthService } from './_service/auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'angular-ecommerce';
-  userData: FormGroup; // Déclarez userData comme un FormGroup
+export class AppComponent implements OnInit {
+  isAdmin: boolean = false;
+  isLoggedIn: boolean = false;
+  currentPath: string | null = '';
 
-  constructor(private formBuilder: FormBuilder) {
-    this.userData = this.formBuilder.group({
-      value: this.formBuilder.group({
-        type: [''] // Initialisez le champ type avec une valeur par défaut vide
-      })
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router, private authService:AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Vérifier le statut de connexion
+        this.isLoggedIn = this.authService.isLoggedIn();
+        // Vérifier le statut d'administration
+        this.isAdmin = this.authService.isAdmin();
+        // Mettre à jour le chemin actuel
+        this.currentPath = this.router.url;
+      }
     });
   }
 
-  isAdmin(): boolean {
-    // Vérifiez si userData.value et userData.value.type sont définis
-    if (this.userData.value && this.userData.value.type) {
-      // Vérifiez si le type contient 'admin'
-      return this.userData.value.type.includes('admin');
-    } else {
-      return false; // Retournez false par défaut si userData ou userData.value.type ne sont pas définis
-    }
+  isLoginOrSignup(): boolean {
+    return this.currentPath === '/register' || this.currentPath === '/login';
   }
+  isArticlesPageOrCategoriesPage(): boolean {
+    return this.currentPath === '/articles' || this.currentPath === '/categories';
+  }
+  
+  isOnAdminDashboard(): boolean {
+    return !!this.currentPath && (this.currentPath.startsWith('/admin') || 
+           this.currentPath.startsWith('/overview') || 
+           this.currentPath.startsWith('/users') || 
+           this.currentPath.startsWith('/header') || 
+           this.currentPath.startsWith('/enchers') || 
+           this.currentPath.startsWith('/article') || 
+           this.currentPath.startsWith('/categorie') || 
+           this.currentPath.startsWith('/demande-vendeur') || 
+           this.currentPath.startsWith('/paiment') || 
+           this.currentPath.startsWith('/parten'));
+  }
+  
+ 
+ 
 }

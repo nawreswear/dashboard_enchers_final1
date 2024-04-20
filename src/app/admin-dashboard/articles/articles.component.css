@@ -1,6 +1,6 @@
 .container {
   padding: 40px; /* Increase padding to add more space */
-  width: 300%;
+  width: 310%;
   height: 300%;
   padding: 20px;
   background-color: #ffffff; 
@@ -11,7 +11,7 @@
  margin-left: 9%;
  margin-top: -67rem; 
   height: 10%;
-  width: 35%;
+  width: 25%;
   border-collapse: collapse;
 }
 .table th,
@@ -127,7 +127,7 @@
 
 .btn-add {
   font-weight: bold;
-  top:130px;
+  top:154px;
   margin-bottom: 50%;
   position: absolute;/* Position fixe pour maintenir le bouton en haut */
   /* Distance du haut de la page */

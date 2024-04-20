@@ -8,7 +8,7 @@ interface Enchere {
   parten: { id: number };
   admin: { id: number };
   articles: { id: number }[];
-  meetingId?: string; 
+ 
 }
 interface Article {
   id: number; // Assurez-vous que le type correspond à votre base de données

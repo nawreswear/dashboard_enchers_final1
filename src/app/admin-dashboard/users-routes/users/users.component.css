@@ -27,10 +27,11 @@
      font-style: italic;
      border-radius: 10px;
      margin-right: 20px;
+     margin-bottom: 10px;
  }
  
  .user-form {
-     width: 100%;
+    width: 100%;
  }
  
  .alert-success {
@@ -98,7 +99,7 @@
  }
  .alert-container {
      position: fixed;
-     top: 50%;
+     top: 65%;
      left: 50%;
      transform: translate(-50%, -50%);
      background-color: #ffffff;
@@ -138,7 +139,7 @@
  
  /* Styles for the sidebar container */
  .sidebar {
-    width: 280px;
+  width: 280px;
   background-color: #0a2250;
   height: 1200px;
   padding: 20px;

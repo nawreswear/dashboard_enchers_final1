@@ -1,5 +1,4 @@
 <div class="bg-white" *ngIf="!isLoginOrSignup()">
-  <!-- Mobile menu  -->
   <div class="relative transition-all ease-linear duration-300"
     [ngClass]="{'-z-[1] opacity-0':!menuOpened,'z-40 opacity-100':menuOpened}" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
@@ -9,8 +8,6 @@
 
       <div class="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4 ease-in-out duration-300"
         [ngClass]="{'opacity-0':!menuOpened,'opacity-100':menuOpened}">
-
-
         <div class="absolute top-0 right-0 -mr-12 pt-2" (click)="toggleMenu()">
           <button type="button"
             class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -22,8 +19,7 @@
           </button>
         </div>
 
-        <!-- Links -->
-        <div class="space-y-6 border-t border-gray-200 py-6 px-4">
+       <div class="space-y-6 border-t border-gray-200 py-6 px-4">
           <div class="flow-root">
             <a routerLink="articles" routerLinkActive="activeLink" class="link">Aricles</a>
           </div>
@@ -53,14 +49,11 @@
   </div>
   <header class="relative z-10">
     <nav aria-label="Top">
-      <!-- Top navigation -->
-      <!-- Secondary navigation -->
       <div class="bg-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="border-b border-gray-200">
             <div class="flex h-16 items-center justify-between">
 
-              <!-- Logo (lg+) -->
               <div class="hidden lg:flex lg:items-center">
                 <a routerLink="/">
                   <span class="sr-only">Your Company</span>
@@ -74,21 +67,19 @@
               </div>
 
               <div class="hidden h-full lg:flex">
-                <!-- Mega menus -->
                 <div class="ml-8">
                   <div class="flex h-full justify-center space-x-8">
                   
-                      <a *ngIf="userType === 'user' || userType === 'vendeur'" routerLink="articles" routerLinkActive="activeLink" class="link">Articles</a>           
-                      <a routerLink="categories" routerLinkActive="activeLink" class="link">Categories</a>
-                      <a *ngIf="userType === 'user' || userType === 'vendeur'" routerLink="enchere" routerLinkActive="activeLink" class="link">Enchères</a>
-                      <a  routerLink="about" routerLinkActive="activeLink" class="link">About</a>
+                      <a *ngIf="userType === 'user' || userType === 'vendeur'" routerLink="/articles" routerLinkActive="activeLink" class="link">Articles</a>           
+                      <a routerLink="/categories" routerLinkActive="activeLink" class="link">Categories</a>
+                      <a *ngIf="userType === 'user' || userType === 'vendeur'" routerLink="/enchere" routerLinkActive="activeLink" class="link">Enchères</a>
+                      <a  routerLink="/about" routerLinkActive="activeLink" class="link">About</a>
                       <div *ngIf="authService.isLoggedIn()"  class="flex items-center space-x-4">
                         <a *ngIf="userType === 'user' " routerLink="/demandevendeur" routerLinkActive="activeLink" class="link">Demande Vendeur</a> 
                       </div>      
                       <a class="link">
-                          <span class="enchere-icon" style="background-color: rgb(236, 35, 35);border-radius: 5%;"> <!-- Ajoutez une classe pour l'icône rouge -->
+                          <span class="enchere-icon" style="background-color: rgb(236, 35, 35);border-radius: 5%;"> 
                              Encheres En cours
-                            <!-- Affichez le nombre d'enchères en cours à l'intérieur de la balise span -->
                             {{ nombreEncheresEnCours }}
                           </span>
                         </a>
@@ -97,23 +88,20 @@
                 </div>
               </div>
 
-              <!-- Mobile menu and search (lg-) -->
+       
               <div class="flex flex-1 items-center lg:hidden">
-                <!-- Mobile menu toggle, controls the 'mobileMenuOpen' state. -->
+         
                 <button (click)="toggleMenu()" type="button" class="-ml-2 rounded-md bg-white p-2 text-gray-400">
                   <span class="sr-only">Open menu</span>
-                  <!-- Heroicon name: outline/bars-3 -->
+           
                   <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round"
                       d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                   </svg>
                 </button>
-
-                <!-- Search -->
                 <a class="ml-2 p-2 text-gray-400 hover:text-gray-500">
                   <span class="sr-only">Search</span>
-                  <!-- Heroicon name: outline/magnifying-glass -->
                   <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -122,7 +110,6 @@
                 </a>
               </div>
 
-              <!-- Logo (lg-) -->
               <a routerLink="/" class="lg:hidden ">
                 <span class="sr-only">Your Company</span>
                 <img src="./assets/logo.png" alt="" class="h-8 w-auto">
@@ -150,8 +137,6 @@
                         <img id="avatarButton" type="button" class="w-8 h-8 rounded-full cursor-pointer"
                           [src]="userData.nom || 'assets/profile.png' " alt="User dropdown">
                       </div>
-
-                      <!-- Dropdown menu -->
                       <div [ngClass]="{'opacity-100 scale-100':userMenu,'opacity-0 scale-50' : !userMenu}"
                         class="z-5 transform duration-300 origin-top absolute  top-[150%] right-0 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                         <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
@@ -235,7 +220,7 @@
                         <p class="info-value">{{ authService.getUserType() }}</p>
                       </div>
                     </span>
-                    <!-- Logout button -->
+  
                     
                   </div>                
                 </div>                

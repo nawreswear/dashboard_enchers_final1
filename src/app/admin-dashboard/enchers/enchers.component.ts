@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ArticleService } from '../article.service';
-import {  Observable, Subject } from 'rxjs';
+import {  EMPTY, Observable, Subject,catchError,forkJoin, mergeMap } from 'rxjs';
 import { EnchereService } from '../enchers-service.service';
-
 import { Router } from '@angular/router';
-import { ci } from '@fullcalendar/core/internal-common';
+
 interface Enchere {
   id?: number;
   dateDebut: string;
@@ -28,6 +27,7 @@ interface Article {
   livrable:boolean;
   statut:string;
   quantiter?: number;
+  idEnchere?: number;
 }
 interface Part_En{
   id: number;
@@ -43,7 +43,7 @@ export class EnchersComponent implements OnInit {
 parseDate(dateString: string): number | undefined {
   return parseInt(dateString, 10); // Convertit la chaîne en nombre entier
 }
-
+enchereEnCours: any; 
   public myForm!: FormGroup;
   public encheres: Enchere[] = [];
   public loading: boolean = false;
@@ -55,9 +55,9 @@ parseDate(dateString: string): number | undefined {
   public showAddForm: boolean = false; 
   public formattedDateDebut!: string;
   public formattedDateFin!: string;
-  private unsubscribe$ = new Subject<void>();
-
-  constructor(
+  //private unsubscribe$ = new Subject<void>();
+  updatedArticles: any = {};
+  constructor(private http: HttpClient,
     private formBuilder: FormBuilder,
     private encherService: EnchereService,
     private snackBar: MatSnackBar,
@@ -79,8 +79,9 @@ parseDate(dateString: string): number | undefined {
       dateDebut: [new Date()],
       parten: ['', Validators.required], 
       admin: ['', Validators.required], 
-      articles: this.formBuilder.control([]) 
-    });    
+      articles: this.formBuilder.control(['']), // Contrôle pour les articles
+      updatedArticles: this.formBuilder.control('') // Ajoutez ce contrôle pour les articles mis à jour
+    });
     this.formattedDateDebut = this.formatDate(this.myForm.value.dateDebut);
     this.formattedDateFin = this.formatDate(this.myForm.value.dateFin);
   }
@@ -92,6 +93,27 @@ parseDate(dateString: string): number | undefined {
     this.getAllAdmins();
     this.getAllArticles();
   }
+  participer() {
+    const partEn: Part_En = {
+      id: 1 
+    };
+    this.addPartEn(partEn).subscribe(
+      (result: Part_En) => {
+        // Gérez la réponse si nécessaire
+        console.log('Participation réussie :', result);
+        this.snackBar.open('Vous avez participé avec succès!', 'Fermer', {
+          duration: 3000
+        });
+      },
+      (error: any) => {
+        console.error('Erreur lors de la participation :', error);
+        this.snackBar.open('Erreur lors de la participation', 'Fermer', {
+          duration: 3000
+        });
+      }
+    );
+  }
+
   addPartEn(partEn: Part_En): Observable<Part_En> {
     return this.encherService.addPart_En(partEn);
   }
@@ -106,7 +128,7 @@ parseDate(dateString: string): number | undefined {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
 
@@ -120,7 +142,16 @@ getAllArticles() {
     }
   );
 }
-
+addSelectedArticle(articleId: number) {
+  const articlesControl = this.myForm.get('articles');
+  if (articlesControl) {
+    const selectedArticles = articlesControl.value as number[];
+    if (!selectedArticles.includes(articleId)) {
+      selectedArticles.push(articleId);
+      articlesControl.setValue(selectedArticles);
+    }
+  }
+}
   getAllPartens() {
     this.encherService.getAllPartens().subscribe(
       (partens: any[]) => {
@@ -142,7 +173,7 @@ getAllArticles() {
       }
     );
   }
-  getAllEncheres() {
+  /*getAllEncheres() {
     this.loading = true;
     this.encherService.getAllEncheres().subscribe(
       (encheres: Enchere[]) => {
@@ -155,6 +186,7 @@ getAllArticles() {
           } else {
             console.log("Aucun administrateur associé à cette enchère.");
           }
+
         });
         this.loading = false;
       },
@@ -166,7 +198,39 @@ getAllArticles() {
         });
       }
     );
-  }  
+  }  */
+  getAllEncheres() {
+    this.loading = true;
+    this.encherService.getAllEncheres().subscribe(
+      (encheres: Enchere[]) => {
+        this.encheres = encheres;
+        // Accédez à la propriété parten de chaque objet Enchere pour forcer le chargement
+        this.encheres.forEach(enchere => {
+          const parten = enchere.parten;
+          if (parten && parten.id) {
+            console.log("Partenaire chargé pour l'enchère :", parten);
+          }
+          if (enchere.admin && enchere.admin.id) {
+            console.log("ID de l'administrateur pour cette enchère :", enchere.admin.id);
+          } else {
+            console.log("Aucun administrateur associé à cette enchère.");
+          }
+        });
+
+        console.log("Enchères récupérées :", encheres);
+        this.loading = false;
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching encheres:', error);
+        this.loading = false;
+        this.snackBar.open('Error loading encheres!', 'Close', {
+          duration: 3000
+        });
+      }
+    );
+  } 
+
+  
   async getArticleTitle(articleId: number): Promise<string> {
     try {
         const article = this.articles.find(article => article.id === articleId);
@@ -222,8 +286,6 @@ participerEnchere(userId: number, enchereId: number) {
           admin: { id: selectedAdmin.id },
           articles: this.myForm.value.articles.map((article: any) => ({ id: article.id }))
         };
-        /*this.addPartEn({ id: 1 }).subscribe(() => {
-        });*/
         this.encherService.addEnchere(newEnchere).subscribe(
           (response: any) => {
             this.myForm.reset();
@@ -252,71 +314,106 @@ participerEnchere(userId: number, enchereId: number) {
     this.myForm.reset();
     this.showAddForm=false;
   }
-  onSubmit() {
-    if (this.editMode) {
-      if (this.editForm.valid) {
-        const updatedEnchere: Enchere = {
-          id: this.editForm.value.id,
-          dateFin: this.editForm.value.dateFin,
-          dateDebut: this.editForm.value.dateDebut,
-          parten: { id: this.editForm.value.parten },
-          admin: { id: this.editForm.value.admin },
-          articles: this.editForm.value.articles.map((article: any) => ({ id: article }))
-        };
-        if (updatedEnchere.id !== undefined) {
-          this.encherService.updateEnchere(updatedEnchere.id, updatedEnchere).subscribe(
-            () => {
-              const index = this.encheres.findIndex(enchere => enchere.id === updatedEnchere.id);
-              if (index !== -1) {
-                this.encheres[index] = updatedEnchere;
-              }
-              this.editForm.reset();
-              this.editMode = false;
-              this.snackBar.open('Enchère mise à jour avec succès!', 'Fermer', { duration: 3000 });
-          },
-            (error: HttpErrorResponse) => {
-              console.error('Erreur lors de la mise à jour de l\'enchère :', error);
-              this.snackBar.open('Erreur lors de la mise à jour de l\'enchère', 'Fermer', { duration: 3000 });
-            }
-          );
+onSubmit() {
+  if (this.editMode && this.editForm.valid) {
+    const updatedEnchere: Enchere = {
+        id: this.editForm.value.id,
+        dateFin: this.editForm.value.dateFin,
+        dateDebut: this.editForm.value.dateDebut,
+        parten: { id: this.editForm.value.parten },
+        admin: { id: this.editForm.value.admin },
+        // Utilisez l'ID de l'article sélectionné à partir de la liste des articles dans le formulaire
+        articles: [{ id: this.editForm.value.articles }]
+    };
+
+    if (updatedEnchere.id !== undefined) {
+        if (updatedEnchere.articles && updatedEnchere.articles.length > 0 && updatedEnchere.articles[0].id !== undefined) {
+            this.encherService.updateEnchere(updatedEnchere.id, updatedEnchere).subscribe(
+                (response: any) => {
+                    // Utilisez l'ID de l'article sélectionné pour mettre à jour l'enchère
+                    this.encherService.updateIdEncherss(updatedEnchere.articles[0].id, response.id).subscribe(
+                        () => {
+                            this.editForm.reset();
+                            this.editMode = false;
+                            this.snackBar.open('Enchère mise à jour avec succès!', 'Fermer', { duration: 3000 });
+                        },
+                        (error: HttpErrorResponse) => {
+                            console.error('Erreur lors de la mise à jour des articles :', error);
+                            this.snackBar.open('Erreur lors de la mise à jour des articles', 'Fermer', { duration: 3000 });
+                        }
+                    );
+                },
+                (error: HttpErrorResponse) => {
+                    console.error('Erreur lors de la mise à jour de l\'enchère :', error);
+                    this.snackBar.open('Erreur lors de la mise à jour de l\'enchère', 'Fermer', { duration: 3000 });
+                }
+            );
         } else {
-          console.error('ID de l\'enchère non défini.');
+            console.error('L\'ID de l\'article n\'est pas défini.');
         }
-      }
     } else {
-      // Si le mode édition n'est pas activé, créez une nouvelle enchère
-      if (this.myForm.valid) {
-        const newEnchere: Enchere = {
-          id: this.myForm.value.id,
-          dateFin: this.myForm.value.dateFin,
-          dateDebut: this.myForm.value.dateDebut,
-          parten: { id: this.myForm.value.parten },
-          admin: { id: this.myForm.value.admin },
-          articles: this.myForm.value.articles.map((article: any) => ({ id: article.id }))
-        };
-  
-        this.encherService.addEnchere(newEnchere).subscribe(
-          (response: any) => {
-            // Ajoutez la nouvelle enchère à la liste des enchères
-            this.encheres.push(response);
-            // Réinitialisez le formulaire
-            this.myForm.reset();
-            // Affichez un message de succès à l'utilisateur
-            this.snackBar.open('Enchère créée avec succès!', 'Fermer', {
-              duration: 3000
-            });
-          },
-          (error: HttpErrorResponse) => {
-            console.error('Erreur lors de la création de l\'enchère :', error);
-            // Affichez un message d'erreur à l'utilisateur
-            this.snackBar.open('Erreur lors de la création de l\'enchère', 'Fermer', {
-              duration: 3000
-            });
-          }
-        );
-      }
+        console.error('L\'ID de l\'enchère n\'est pas défini.');
     }
-  }  
+}
+
+ else {
+        if (this.myForm.valid) {
+            const newEnchere: Enchere = {
+                id: this.myForm.value.id,
+                dateFin: this.myForm.value.dateFin,
+                dateDebut: this.myForm.value.dateDebut,
+                parten: { id: this.myForm.value.parten },
+                admin: { id: this.myForm.value.admin },
+                articles: this.myForm.value.articles.map((articleId: number) => ({ id: articleId }))
+            };
+            this.encherService.addEnchere(newEnchere).subscribe(
+                (response: any) => {
+                    this.encheres.push(response);
+                    this.updateArticle(newEnchere.articles, response.id);
+                    this.myForm.reset();
+                    this.snackBar.open('Enchère créée avec succès!', 'Fermer', { duration: 3000 });
+                },
+                (error: HttpErrorResponse) => {
+                    console.error('Erreur lors de la création de l\'enchère :', error);
+                    this.snackBar.open('Erreur lors de la création de l\'enchère', 'Fermer', { duration: 3000 });
+                }
+            );
+        } else {
+            console.error('Utilisateur ou administrateur non trouvé.');
+            this.snackBar.open('Utilisateur ou administrateur non trouvé.', 'Fermer', { duration: 3000 });
+        }
+    }
+}
+
+updateArticle(articles: { id: number }[], enchereId: number): void {
+  // Vérifier si des articles sont définis avant de mettre à jour
+  if (articles && articles.length > 0) {
+      // Filtrer les articles avec des IDs non définis ou nuls
+      const articlesToUpdate = articles.filter(article => article.id !== null && article.id !== undefined);
+
+      articlesToUpdate.forEach(article => {
+          console.log("article id :",article.id);
+          // Vérifier si l'ID de l'article est un nombre
+          if (typeof article.id === 'number') {
+            console.log("article id :",article.id);
+              this.encherService.updateIdEnchers(article.id, enchereId).subscribe(
+                  () => {
+                      console.log('Article mis à jour avec succès!');
+                      // Si nécessaire, ajoutez d'autres instructions ici après la mise à jour de l'article
+                  },
+                  (error: HttpErrorResponse) => {
+                      console.error('Erreur lors de la mise à jour de l\'article :', error);
+                      this.snackBar.open('Erreur lors de la mise à jour de l\'article', 'Fermer', { duration: 3000 });
+                  }
+              );
+          } else {
+              console.error('ID d\'article non défini ou invalide.');
+          }
+      });
+  } else {
+      console.error('Aucun article à mettre à jour.');
+  }
+}
   editEnchere(enchere: Enchere) {
     this.editMode = true;
     this.editForm.patchValue({
@@ -328,9 +425,6 @@ participerEnchere(userId: number, enchereId: number) {
       articles: enchere.articles ? enchere.articles.map(article => article.id) : [] // Vérifiez si enchere.articles est défini avant de mapper
     });
   }
-  
-  
-  
   deleteEnchere(id: number) {
     // Appelez le service pour supprimer l'enchère
     this.encherService.deleteEnchere(id).subscribe(
@@ -351,65 +445,28 @@ participerEnchere(userId: number, enchereId: number) {
       }
     );
   }
-  
+ 
   cancelEdit() {
-    // Réinitialisez le formulaire d'édition
     this.editForm.reset();
-    // Passez en mode non édition
     this.editMode = false;
   }
-  public links: any = [
-    {
-      title: 'Dashboard',
-      items: [
-        {
-          name: 'overview',
-          icon: 'fa-solid fa-house',
-        }, {
-          name: 'billboards',
-          icon: 'fa-brands fa-bandcamp',
+  updateEnchere(enchereId: number, updatedEnchere: Enchere): void {
+    this.encherService.updateEnchere(enchereId, updatedEnchere).subscribe(
+      () => {
+        const index = this.encheres.findIndex(enchere => enchere.id === enchereId);
+        if (index !== -1) {
+          this.encheres[index] = updatedEnchere;
         }
-      ],
-    },
-
-    {
-      title: 'Pages',
-      items: [
-        {
-          name: 'users',
-          icon: 'fa-solid fa-users',
-        }, {
-          name: 'enchers',
-          icon: 'fa-solid fa-bag-shopping',
-        },
-        {
-          name: 'categorie',
-          icon: 'fa-solid fa-dumpster-fire',
-        },
-        {
-          name: 'article',
-          icon: 'fa-solid fa-dumpster-fire',
-        },
-        {
-          name: 'demande-vendeur',
-          icon: 'fa-solid fa-users',
-        },
-        {
-          name: 'commentaire',
-          icon: 'fa-solid fa-comment',
-        },
-       {
-          name: 'tags',
-          icon: 'fa-solid fa-tag'
-        }
-      ],
-    },
-
-  ];
-
- 
-
-// [routerLink]="['/', item.name]
+        this.snackBar.open('Enchère mise à jour avec succès!', 'Fermer', { duration: 3000 });
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Erreur lors de la mise à jour de l\'enchère :', error);
+        this.snackBar.open('Erreur lors de la mise à jour de l\'enchère', 'Fermer', { duration: 3000 });
+      }
+    );
+  }
+  
+  
   public currentPath: string | undefined;
 
   public navigateTo(item: string) {

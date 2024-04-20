@@ -1,3 +1,18 @@
+.bid-form-group {
+  display: flex;
+  align-items: center;  /* Align label and input vertically */
+  margin-bottom: 1rem;
+}
+
+.bid-form-group label {
+  flex: 0 0 30%;  /* Allocate 30% width to label */
+  margin-right: 1rem;  /* Add space between label and input */
+}
+
+.bid-form-group input {
+  flex: 1;  /* Make input field fill remaining space */
+}
+
 @import '~@fortawesome/fontawesome-free/css/all.css';
 
 /* Styles pour les grands écrans */
@@ -146,14 +161,14 @@
  
   .form-container {
     position: absolute;
-    top: 65%;
+    top: 59.5%;
     left: 55%;
     margin-left: 10px;
     transform: translate(-50%, -50%);
     width: 73%;
     padding: 20px;
     border-radius: 8px;
-   background-color: white;
+    background-color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   } 
 .form-container h2 {
@@ -163,7 +178,7 @@
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.1rem;
 }
 
 .form-group label {
@@ -280,12 +295,12 @@
 .form-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-  margin-top: 5px;
+  margin-bottom: 2px;
+  margin-top: 2px;
 }
 .add {
   position: absolute;/* Position fixe pour maintenir le bouton en haut */
-  top: 130px; /* Distance du haut de la page */
+  top: 140px; /* Distance du haut de la page */
   right: 68%;/* Distance de la droite de la page */
   z-index: 1000; /* Pour s'assurer que le bouton est au-dessus des autres éléments */
   background-color: rgb(92, 90, 221);/* Couleur de fond */
@@ -308,7 +323,7 @@ h2 {
   background-color: #0056b3; /* Changement de couleur de fond au survol */
 }
 .form-container input[type="text"]:focus {
-  border-color: #66afe9;
+  border-color: #505152;
   outline: none;
 }
 .btn-add {

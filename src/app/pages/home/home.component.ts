@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Category } from '../../interfaces/category';
 import { CategoriesService } from 'src/app/categories.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,6 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from 'src/app/_service/auth.service';
 import { ArticleService } from 'src/app/article.service';
 import { tap, map, switchMap } from 'rxjs/operators';
+import { CardsComponent } from 'src/app/shopping-cart/cards/cards.component';
+import { ToastrService } from 'ngx-toastr';
 interface Categorie {
   id: number;
   titre: string;
@@ -36,6 +38,7 @@ interface Enchere {
   admin: { id: number };
   articles: { id: number }[];
   meetingId?: string; 
+  
 }
 
 interface Article {
@@ -44,7 +47,7 @@ interface Article {
   description: string;
   photo: string;
   prix:string;
-  prixvente:string;
+  prixvente?: number;
   livrable:boolean;
   statut:string;
   quantiter:number;
@@ -61,17 +64,48 @@ export class HomeComponent implements OnInit {
   categories: Category[] = [];
   relatedArticles: Article[] = []; 
   userType: string | string[] | null;
+  public categoryArticles: Article[] = [];
+  public collapsed = true;
+  nombreEncheresEnCours: number = 0;
+  encheres: Enchere[] = []; // Initialisez le tableau des enchères
+  loading: boolean = false; // Initialisez le chargement des données
+  showCart = false;
+  orderFinished = false;
+  @ViewChild('productsC')
+  productsC!: CardsComponent;
+  
+   images: string[] = ['assets/image1.jpg', 'assets/image2.jpg', 'assets/image3.jpg'];
+   currentImageIndex: number = 0;
+    searchValue: string | null = null;
+    menuOpened: boolean = false;
+    currentPath: string | null = '';
+    userData: User | null = null;
+    userMenu: boolean = false;
+    showUserInfo = false;
+
   //images: string[] = ['assets/33.jpg', 'assets/15.jpg', 'assets/36.jpg'];
-currentImageIndex: number = 0;
   constructor(private categoryService: CategoriesService,
     private formBuilder: FormBuilder,
     private encherService: EnchersServiceService,
-    private snackBar: MatSnackBar,  public router: Router,private authService: AuthService  ,
-   private articleService: ArticleService
+    private snackBar: MatSnackBar,  public router: Router,public authService: AuthService,
+   private articleService: ArticleService,
+   private authenticationService: AuthService,
+   private toastrService: ToastrService,
+   private enchereService: EnchersServiceService,private categoriesService:CategoriesService
   ) {
     this.myForm = this.createEnchereForm();
     this.editForm = this.createEnchereForm();
     this.userType = this.authService.getUserType();
+    this.userType = this.authService.getUserType();
+    this.router.events.subscribe((path: any) => {
+      this.currentPath = path?.routerEvent?.url;
+      this.menuOpened = false;
+    });
+    this.authenticationService.userDataObs$.subscribe({
+      next: (value) => {
+        this.userData = value;
+      },
+    });
     this.myForm = this.formBuilder.group({
       id: [0],
       dateFin: [new Date()],
@@ -122,6 +156,9 @@ currentImageIndex: number = 0;
       },
       error: (error: HttpErrorResponse) => console.error(error), // Ajouter le type HttpErrorResponse
     });
+    setInterval(() => {
+      this.changeImage();
+    }, 5000); // Change image every 5 seconds
     
     this.getAllEncheres();
     this.getAllPartens();
@@ -149,6 +186,104 @@ currentImageIndex: number = 0;
     });
   }
 
+  countEncheresEnCours() {
+    const now = new Date(); // Obtenez la date actuelle
+  
+    // Filtrez les enchères pour ne garder que celles dont la date de début est antérieure à la date actuelle
+    const encheresEnCours = this.encheres.filter((enchere: Enchere) => new Date(enchere.dateDebut) < now);
+  
+    // Mettez à jour le nombre d'enchères en cours
+    this.nombreEncheresEnCours = encheresEnCours.length;
+  }
+  
+  getAllEncheres() {
+    this.loading = true;
+    this.enchereService.getAllEncheres().subscribe(
+      (encheres: Enchere[]) => {
+        this.encheres = encheres;
+        this.loading = false;
+  
+        // Comptez le nombre d'enchères en cours
+        this.countEncheresEnCours();
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching encheres:', error);
+        this.loading = false;
+        this.snackBar.open('Error loading encheres!', 'Close', {
+          duration: 3000
+        });
+      }
+    );
+  }
+  
+  finishOrder(orderFinished: any) {
+    this.orderFinished = orderFinished;
+    if (this.orderFinished===false){
+    this.ArticleAdded.map((p)=>{
+    p.quantiter=0;
+    })
+    this.ArticleAdded =[]
+    }
+  }
+  
+  
+  // Dans NavbarComponent
+  toggleCartDetails(): void {
+    this.showCart = !this.showCart;
+  }
+  
+  
+  
+  reset() {
+  this.orderFinished = false;
+  }
+  
+  ArticleAdded :any[]=[]
+  
+  addProductToCart(product:any) {
+  let existe=false;
+  this.ArticleAdded.map((p)=>{
+  if(p.product._id===product.product._id) {existe=true}
+  })
+  if(existe===false) this.ArticleAdded.push(product);
+  }
+  
+  
+    toggleUserInfo() {
+      this.showUserInfo = !this.showUserInfo;
+      console.log('showUserInfo:', this.showUserInfo);
+    }
+    changeImage() {
+      this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+    }
+    toggleMenu() {
+      this.menuOpened = !this.menuOpened;
+    }
+  
+    isLoginOrSignup(): boolean {
+      return this.currentPath === '/register' || this.currentPath === '/login';
+    }
+  
+  
+    isLoggedIn() {
+      return this.authenticationService.isLoggedIn();
+      
+    }
+  
+    toggleUserMenu() {
+      this.userMenu = !this.userMenu;
+    }
+  
+  
+    logout() {
+      // Clear user data
+      localStorage.removeItem('token');
+      localStorage.removeItem('type');
+      // Refresh the page
+      window.location.reload();
+      // Optional: Navigate to the login page
+      // this.router.navigate(['/login']);
+    }
   showRelatedArticles(categoryId: number) {
     // Filtrer les articles ayant la même catégorie ID
     this.relatedArticles = this.articles.filter(article => article.categorie.id === categoryId);
@@ -198,8 +333,7 @@ currentImageIndex: number = 0;
   token = new BehaviorSubject<string | null>(null);
   tokenObs$ = this.token.asObservable();
 
-  userData = new BehaviorSubject<User | null>(null);
-  userDataObs$ = this.userData.asObservable();
+
 
   urlPattern = new RegExp('^(https?:\\/\\/)?'+ // Protocole
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // Nom de domaine
@@ -215,8 +349,6 @@ parseDate(dateString: string): number | undefined {
 }
 selectedArticle: Article | null = null;
   public myForm!: FormGroup;
-  public encheres: Enchere[] = []; // Utiliser le bon type Enchere[]
-  public loading: boolean = false;
   public articles: Article[] = [];
   public editMode: boolean = false;
   public editForm!: FormGroup;
@@ -232,7 +364,6 @@ selectedArticle: Article | null = null;
  // Déclarez la propriété isLoggedInSubject avec la bonne visibilité
  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
  authStatus = this.isLoggedInSubject.asObservable();
- ArticleAdded :any[]=[]
   
  addToCart(article: any) {
    const quantity = 1; // Définissez la quantité de l'article à ajouter au panier
@@ -355,25 +486,10 @@ joinMeeting(meetingId: string) {
     return `${year}-${month}-${day} T ${hours}:${minutes}`;
 }
 
-isLoggedIn(): boolean {
+/*isLoggedIn(): boolean {
   return !!this.token.value;
-}
-getAllEncheres() {
-  this.loading = true;
-  this.encherService.getAllEncheres().subscribe(
-    (encheres: Enchere[]) => {
-      this.encheres = encheres;
-      this.loading = false;
-    },
-    (error: HttpErrorResponse) => {
-      console.error('Error fetching encheres:', error);
-      this.loading = false;
-      this.snackBar.open('Error loading encheres!', 'Close', {
-        duration: 3000
-      });
-    }
-  );
-}
+}*/
+
 getAllArticles() {
   this.articleService.getAllArticles().subscribe(
     (articles: Article[]) => {

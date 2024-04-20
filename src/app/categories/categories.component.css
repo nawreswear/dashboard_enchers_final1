@@ -110,6 +110,14 @@ h2 {
     text-align: center;
     color: white;
   }
+  .category-details {
+    margin-top: 20px;
+}
+
+/* Ajouter une marge inférieure pour donner de l'espace en dessous des articles de chaque catégorie */
+.category-details:last-child {
+    margin-bottom: 20px;
+}
   
 /* Styling pour les icônes */
 .fa-edit{
@@ -282,10 +290,11 @@ label {
     color: #28a745; /* Green success message color */
     font-weight: bold; /* Emphasize success message */
 }
+
 .card-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content:start;
+    justify-content:space-between;
 
   }
   

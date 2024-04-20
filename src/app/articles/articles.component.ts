@@ -2,32 +2,34 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ArticleService } from '../article.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+
 import { AuthService } from '../_service/auth.service';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { tap } from 'rxjs/operators';
+
 interface Article {
   id: number;
   titre: string;
   description: string;
   photo: string;
   prix: string;
-  prixvente: string;
-  livrable:boolean;
-  statut: string; 
+  prixvente?: number;
+  livrable: boolean;
+  statut: string;
   quantiter: number;
   vendeur: { id: number };
   categorie: Categorie;
 }
+
 interface Categorie {
-  id: number; 
+  id: number;
   titre: string;
   description: string;
   image: string;
 }
+
 @Component({
   selector: 'app-articles',
   templateUrl: './articles.component.html',
@@ -36,49 +38,51 @@ interface Categorie {
 export class ArticlesComponent implements OnInit {
   displayedColumns = ['titre', 'description', 'photo', 'prix', 'Livrable', 'status', 'quantite', 'actions'];
   public editMode: boolean = false;
-  userId!: number | null; 
+  userId!: number | null;
   editingArticle: Article | null = null;
   userId$: Observable<number | null> = this.getUserIdObservable();
   public articles: Article[] = [];
   public editArticle: Article | null = null;
-  editForm: FormGroup;
+  editForm!: FormGroup;
+  public vendeurId: number = 0; // Utilisation de 'public' pour déclarer une variable membre
   public loading: boolean = false;
   public photoUrl: string = '';
   public myForm!: FormGroup;
   selectedArticle: Article | null = null;
   vendeur: { id: number } = { id: 0 };
-  urlPattern = new RegExp('^(https?:\\/\\/)?'+ // Protocole
-  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // Nom de domaine
-  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // Ou une adresse IP (v4) 
-  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // Port et chemin
-  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // Paramètres de requête
-  '(\\#[-a-z\\d_]*)?$','i'); // Fragment
+  urlPattern = new RegExp('^(https?:\\/\\/)?' + // Protocole
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // Nom de domaine
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // Ou une adresse IP (v4) 
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // Port et chemin
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // Paramètres de requête
+    '(\\#[-a-z\\d_]*)?$', 'i'); // Fragment
   onCreatee = false;
   newArticle: Article = {
     id: 0,
     titre: '',
     description: '',
     photo: '',
-    prix:'',
-    prixvente:'',
-    livrable:false,
-    statut:'',
-    quantiter:0,
-    vendeur: { id: 0 } ,
+    prix: '',
+    prixvente: 0,
+    livrable: false,
+    statut: '',
+    quantiter: 0,
+    vendeur: { id: 0 },
     categorie: { id: 0, titre: '', description: '', image: '' }
   };
-  isModificationActive: boolean = false; 
+  isModificationActive: boolean = false;
   userType: string | string[] | null;
-  categories: Categorie[] = []; 
+  categories: Categorie[] = [];
   token = new BehaviorSubject<string | null>(null);
   tokenObs$ = this.token.asObservable();
   showEditForm: boolean = false;
   constructor(
     private formBuilder: FormBuilder, public authService: AuthService,
     private articleService: ArticleService, public router: Router,
-    private snackBar: MatSnackBar
-  ) 
-  { this.userType = this.authService.getUserType();
+    private snackBar: MatSnackBar,
+    private http: HttpClient // Injection de HttpClient
+  ) {
+    this.userType = this.authService.getUserType();
     this.myForm = this.formBuilder.group({
       titre: ['', Validators.required],
       description: ['', Validators.required],
@@ -91,7 +95,7 @@ export class ArticlesComponent implements OnInit {
       categorie: [0],
       vendeur: [0]
     });
-    {
+
     this.editForm = this.formBuilder.group({
       titre: ['', Validators.required],
       description: ['', Validators.required],
@@ -102,28 +106,25 @@ export class ArticlesComponent implements OnInit {
       statut: [''],
       quantiter: [0],
       categorie: [0],
-      vendeur:[0]
+      vendeur: [0]
     });
+
+    this.checkToken();
   }
-  const storedToken = localStorage.getItem('token');
-  if (storedToken) {
-    console.log("storedTokennnn",storedToken);
-    const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
-    console.log(tokenPayload);
-    if (tokenPayload.sub) {
-      const username = tokenPayload.sub;
-      console.log('Nom utilisateur :', username);
-  } else {
-      console.log('Aucun nom d\'utilisateur trouvé dans le token');
-  }
-    this.token.next(storedToken);
-    //this.decodeToken();
-  }
-  this.tokenObs$.subscribe({
-    next: (token) => {
-      if (!token) router.navigate(['/']);
-    },
-  });
+
+  ngOnInit() {
+    this.initForm();
+    this.getAllArticles();
+    this.getAllCategories();
+    this.showEditForm = false;
+    this.getUserIdObservable().subscribe(userId => {
+      if (userId !== null) {
+        this.userId = userId;
+        this.newArticle.vendeur = { id: userId }; // Assurez-vous de mettre à jour vendeur lorsque userId est défini
+      }
+    });
+    this.userId$ = this.getUserIdObservable();
+  
   }
   getAllCategories() {
     this.articleService.getAllCategories().subscribe(
@@ -136,26 +137,13 @@ export class ArticlesComponent implements OnInit {
       }
     );
   }
-  
-  ngOnInit() {
-    this.initForm();
-    this.getAllArticles();
-    this.showEditForm = false;
-    this.getUserIdObservable().subscribe(userId => {
-      if (userId !== null) {
-        this.userId = userId;
-        this.newArticle.vendeur = { id: userId }; // Assurez-vous de mettre à jour vendeur lorsque userId est défini
-      }
-    });
-    this.userId$ = this.getUserIdObservable(); 
-  }
   initForm() {
     this.editForm = this.formBuilder.group({
       titre: ['', Validators.required],
       description: ['', Validators.required],
       photo: ['', Validators.required],
       prix: ['', Validators.required],
-      prixvenet: ['', Validators.required],
+      prixvente: ['', Validators.required], 
       livrable: [false],
       statut: [''],
       quantiter: [0],
@@ -277,7 +265,7 @@ export class ArticlesComponent implements OnInit {
   }
   isUserTheSeller(article: Article): boolean {
     if (this.authService.isLoggedIn() && this.userType === 'vendeur') {
-      console.log("vvvvv",article.vendeur?.id)
+     // console.log("vvvvv",article.vendeur?.id)
       return article.vendeur && article.vendeur.id === this.userId;
     }
     return false;
@@ -353,15 +341,20 @@ editArticleFunc(article: Article) {
     this.myForm.reset(); // Réinitialise le formulaire
     this.photoUrl = '';
   }
+
   onSubmit() {
     if (this.editMode) {
-      console.log("avant update",this.updateArticle(this.editArticle!));
-      this.updateArticle(this.editArticle!);
-      console.log("apres update",this.updateArticle(this.editArticle!));
+      console.log("avant onSubmit - editMode", this.editMode);
+      if (this.editForm && this.editForm.valid && this.editArticle) {
+        console.log("apres onSubmit - editMode", this.editArticle);
+        // Appeler la méthode updateArticle avec subscribe pour réagir à la réponse de la requête HTTP
+        this.updateArticle(this.editArticle);
+      }
     } else {
       this.createArticle();
     }
-  }
+  }  
+  
   updateArticle(updatedArticle: Article) {
     if (this.editForm && this.editForm.valid && this.editArticle) {
       const updatedArticleData: Article = {
@@ -374,13 +367,17 @@ editArticleFunc(article: Article) {
         livrable: this.editForm.value.livrable,
         statut: this.editForm.value.statut,
         quantiter: this.editForm.value.quantiter,
-        vendeur: this.editArticle.vendeur, 
-        categorie: this.editArticle.categorie,// Utilisez la valeur existante de vendeur de l'article en cours d'édition
+        categorie: {
+          id: this.editForm.value.categorie,
+          titre: '', 
+          description: '',
+          image: ''
+        },
+        vendeur: { id: this.editArticle.vendeur.id } // Ajoutez le vendeur à l'article mis à jour
       };
       this.articleService.updateArticle(updatedArticleData.id.toString(), updatedArticleData).subscribe(
-        response => {
-          console.log("updatedArticleData",updatedArticleData);
-          this.isModificationActive = false;
+        Response => {
+          this.editMode = false;
           this.editArticle = null;
           this.editForm.reset();
           this.photoUrl = '';
@@ -398,7 +395,115 @@ editArticleFunc(article: Article) {
       );
     }
   }
+
+  /*onSubmit() {
+    console.log("avant onSubmit - editMode :", this.editMode); // Ajouter un message pour indiquer le début de la fonction onSubmit et afficher la valeur de editMode
+    if (this.editMode) {
+      console.log("Dans editMode"); // Ajouter un message pour indiquer que le mode édition est activé
+      if (this.editForm && this.editForm.valid && this.editArticle) {
+        console.log("Formulaire d'édition valide"); // Ajouter un message pour indiquer que le formulaire d'édition est valide
+        console.log("editArticle :", this.editArticle); // Afficher les détails de l'article en cours d'édition
+        // Récupérer l'ID du vendeur à partir de son nom
+        this.articleService.getUserIdByName(this.editForm.value.nomVendeur).subscribe(
+          (userId: number) => {
+            console.log("ID du vendeur récupéré :", userId); // Afficher l'ID du vendeur récupéré
+            // Appeler la méthode updateArticle avec l'ID du vendeur récupéré
+            if (this.editArticle !== null) {
+              this.updateArticle(this.editArticle, userId);
+            }
+          },
+          (error: HttpErrorResponse) => {
+            console.error('Erreur lors de la récupération de l\'ID du vendeur:', error);
+            this.snackBar.open('Erreur lors de la récupération de l\'ID du vendeur: ' + error.message, 'Fermer', {
+              duration: 3000
+            });
+          }
+        );
+      } else {
+        console.log("Formulaire d'édition invalide"); // Ajouter un message pour indiquer que le formulaire d'édition est invalide
+      }
+    } else {
+      console.log("Hors editMode"); // Ajouter un message pour indiquer que le mode édition n'est pas activé
+      this.createArticle();
+    }
+  }
+
+  updateArticle(updatedArticle: Article, vendeurId: number) {
+    if (this.editForm && this.editForm.valid && this.editArticle) {
+      const updatedArticleData: Article = {
+        id: this.editArticle.id,
+        titre: this.editForm.value.titre,
+        description: this.editForm.value.description,
+        photo: this.editForm.value.photo,
+        prix: this.editForm.value.prix,
+        prixvente: this.editForm.value.prixvente,
+        livrable: this.editForm.value.livrable,
+        statut: this.editForm.value.statut,
+        quantiter: this.editForm.value.quantiter,
+        categorie: {
+          id: this.editForm.value.categorie,
+          titre: '',
+          description: '',
+          image: ''
+        },
+        vendeur: { id: vendeurId } // Utiliser l'ID du vendeur récupéré
+      };
+      this.articleService.updateArticleForVendeur(vendeurId, updatedArticleData.id, updatedArticleData).subscribe(
+        Response => {
+          this.editMode = false;
+          this.editArticle = null;
+          this.editForm.reset();
+          this.photoUrl = '';
+          this.getAllArticles();
+          this.snackBar.open('Article mis à jour avec succès!', 'Fermer', {
+            duration: 3000
+          });
+        },
+        (error: HttpErrorResponse) => {
+          console.error('Erreur lors de la mise à jour de l\'article:', error);
+          this.snackBar.open('Erreur lors de la mise à jour de l\'article: ' + error.message, 'Fermer', {
+            duration: 3000
+          });
+        }
+      );
+    }
+  }*/
   
+  private checkToken() {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+      if (tokenPayload.sub) {
+        const username = tokenPayload.sub;
+        console.log('Nom utilisateur :', username);
+      } else {
+        console.log('Aucun nom d\'utilisateur trouvé dans le token');
+      }
+      this.token.next(storedToken);
+    }
+    this.tokenObs$.subscribe({
+      next: (token) => {
+        if (!token) this.router.navigate(['/']);
+      },
+    });
+  }
+  /*updateArticle(article: Article) {
+    if (this.editForm && this.editForm.valid && article) {
+      this.articleService.updateArticle(article.id.toString(), article).subscribe(
+        () => {
+          console.log("Article mis à jour avec succès !");
+          // Effectuez d'autres actions si nécessaire
+        },
+        (error: HttpErrorResponse) => {
+          console.error("Erreur lors de la mise à jour de l'article:", error);
+          // Gérer l'erreur comme nécessaire
+        }
+      );
+    }
+  }*/
+  
+
+ 
   createArticle() {
     this.onCreatee = true;
     if (this.myForm.valid) {

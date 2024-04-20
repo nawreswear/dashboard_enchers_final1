@@ -45,12 +45,9 @@ export class PanierComponent implements OnInit {
   @Input() ArticleAdded: any;
 
   ngOnInit() {
-    this.getLignePanierDetails();
+    
   }
 
-  getLignePanierDetails() {
-    // Fetch details of lignePanier here
-  }
 
  getUserIdObservable(): Observable<User | null> {
     const storedToken = localStorage.getItem('token');
@@ -78,7 +75,7 @@ export class PanierComponent implements OnInit {
       PDF.save('cart.pdf');
     });
   }
-  addToPanier(panierId: number, articleId: number) {
+ addToPanier(panierId: number, articleId: number) {
     this.articleService.ajouterArticleAuPanier(panierId, articleId).subscribe(
       (response) => {
         console.log('Article ajouté au panier avec succès :', response);
@@ -90,7 +87,43 @@ export class PanierComponent implements OnInit {
       }
     );
   }
-
+  /*addToPanier(panierId: number, articleId: number) {
+    // Récupérer l'article correspondant à l'ID
+    this.articleService.getArticleById(articleId).subscribe(
+      (article) => {
+        // Vérifier si l'article a été récupéré avec succès
+        if (article) {
+          // Vérifier que la propriété prix de l'article est un nombre
+          if (typeof article.prix === 'number') {
+            // Appeler la méthode addToCart() avec l'article et l'ID du panier
+            this.panierService.addToCart(article, panierId).subscribe(
+              (response) => {
+                console.log('Article ajouté au panier avec succès :', response);
+                // Traitez la réponse comme vous le souhaitez, par exemple mettre à jour l'affichage ou afficher un message de confirmation.
+              },
+              (error) => {
+                console.error('Une erreur s\'est produite lors de l\'ajout de l\'article au panier :', error);
+                // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
+              }
+            );
+          } else {
+            console.error('La propriété prix de l\'article n\'est pas un nombre.');
+            // Traitez le cas où la propriété prix de l'article n'est pas un nombre.
+          }
+        } else {
+          console.error('L\'article correspondant à l\'ID n\'a pas été trouvé.');
+          // Traitez le cas où l'article n'a pas été trouvé, par exemple afficher un message d'erreur à l'utilisateur.
+        }
+      },
+      (error) => {
+        console.error('Une erreur s\'est produite lors de la récupération de l\'article :', error);
+        // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
+      }
+    );
+  }
+  */
+  
+  
   removeFromPanier(panierId: number, articleId: number) {
     this.articleService.supprimerArticleDuPanier(panierId, articleId).subscribe(
       (response) => {

@@ -31,7 +31,7 @@
               <p><strong>ID:</strong> {{ paiement.panier.id }}</p>
               <p><strong>Total:</strong> {{ paiement.panier.totalP }}</p>
               <p><strong>Date:</strong> {{ paiement.panier.date | date: 'short' }}</p>
-              <p><strong>Utilisateur:</strong> {{ paiement.panier.user?.nom }} {{ paiement.panier.user?.prenom }}</p>
+              <p><strong>Utilisateur:</strong> {{ paiement.panier.user.nom }} {{ paiement.panier.user.prenom }}</p>
               <p><strong>Ligne de panier:</strong></p>
             </div>
           </td>

@@ -90,7 +90,6 @@ export class ArticlesVendeurComponent implements OnInit {
       }
     );
   }
-  
   ngOnInit(): void {
     // Appelez la fonction pour récupérer le nom de l'utilisateur
     this.nomUtilisateur = this.authService.getUserPassword();
@@ -117,13 +116,12 @@ export class ArticlesVendeurComponent implements OnInit {
         console.log(tokenPayload);
         if (tokenPayload.sub) {
           const username = tokenPayload.sub;
-          console.log('Nom utilisateur :', username);
+          console.log('Nom vendeur :', username);
           // Utilisation directe de tokenPayload.sub pour récupérer le nom d'utilisateur
           this.findUserIdByNom(username).subscribe( vendeurId => {
-              console.log('ID de l\'utilisateur trouvé :', vendeurId);
+              console.log('ID de vendeur trouvé :', vendeurId);
               // Ajoutez l'ID du vendeur aux données de l'article
               const articleData = { ...this.articleForm.value, vendeur: vendeurId };
-
               this.articleService.addArticleWithVendeurId(articleData, vendeurId).subscribe(
                 () => {
                   this.snackBar.open('Article ajouté avec succès !', 'Fermer', { duration: 3000 });

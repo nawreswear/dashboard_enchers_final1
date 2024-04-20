@@ -41,11 +41,16 @@ updateUserType(userId: number): Observable<any> {
   }
  // Méthode pour récupérer toutes les demandes de vendeurs
  getAllDemandeVendeurs(): Observable<demande_Vendeur[]> {
-    return this.http.get<demande_Vendeur[]>('http://localhost:3002/demandesvendeurs/all');
-  }
-  /*getUserIdByName(userName: string): Observable<number> {
-    return this.http.get<number>(`http://localhost:3003/getUserIdByName/${userName}`);
-  }*/
+  return this.http.get<demande_Vendeur[]>('http://localhost:3002/demandesvendeurs/all')
+      .pipe(
+          catchError(error => {
+              console.error('An error occurred:', error);
+              return throwError('Something bad happened; please try again later.');
+          })
+      );
+}
+
+ 
   getUserIdByName(nomuser: string): Observable<number> {
     return this.http.get<number>(`http://localhost:3003/api/${nomuser}`).pipe(
       catchError(error => {

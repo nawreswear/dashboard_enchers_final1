@@ -15,9 +15,6 @@ export class SidebarComponent {
         {
           name: 'overview',
           icon: 'fa-solid fa-house',
-        }, {
-          name: 'billboards',
-          icon: 'fa-brands fa-bandcamp',
         }
       ],
     },
@@ -27,7 +24,7 @@ export class SidebarComponent {
       items: [
         {
           name: 'users',
-          icon: 'fa-solid fa-users',
+          icon: 'fa-solid fa-users-cog' 
         }, {
           name: 'enchers',
           icon: 'fa-solid fa-bag-shopping',
@@ -42,26 +39,91 @@ export class SidebarComponent {
         },
         {
           name: 'demande-vendeur',
-          icon: 'fa-solid fa-users',
+          icon: 'fa-solid fa-file-alt' 
         },
         {
           name: 'paiment',
-          icon: 'fa-solid fa-users',
+          icon: 'fa-solid fa-credit-card',
+        },
+        {
+          name: 'parten',
+          icon: 'fa-solid fa-handshake',
         },
         {
           name: 'commentaire',
           icon: 'fa-solid fa-comment',
         },
-       {
+       /*{
           name: 'tags',
           icon: 'fa-solid fa-tag'
+        },
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-wallet' 
+        },
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-coins' 
+        },
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-users-cog' 
         }
+        ,
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-shopping-bag' 
+        }
+        ,
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-cube' 
+        }
+        ,
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-gift' 
+        }
+        ,
+        {
+          name: 'tags',
+          icon: 'fa-solid fa-cogs' 
+        }
+        ,*/
+        {
+          name: 'livraison',
+          icon: 'fa-solid fa-truck' 
+        }
+        /*,
+        {
+          name: 'livraison',
+          icon: 'fa-solid fa-shopping-cart' 
+        }
+        ,
+        {
+          name: 'livraison',
+          icon: 'fa-solid fa-archive' 
+        }
+        ,
+        {
+          name: 'livraison',
+          icon: 'fa-solid fa-file-alt' 
+        }
+        ,
+        {
+          name: 'livraison',
+        //  icon: 'fa-solid fa-envelope',  icon: 'fa-solid fa-comment-dollar' 
+       // icon: 'fa-solid fa-bullhorn' 
+      // icon: 'fa-solid fa-comments-dollar'
+      icon: 'fa-solid fa-user-tie'
+        }*/
+      
       ],
     },
 
   ];
 
-  //date formateur
+  //date formateur  
   public formatReadableDate(dateString: any) {
     const options: any = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
 

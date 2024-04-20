@@ -23,7 +23,8 @@
       "ES2022",
       "dom"
     ],
-    "types": ["@angular/core", "@angular/common/http", "@angular/platform-browser-dynamic"]
+    "types": ["@angular/core", "@angular/common/http", "@angular/platform-browser-dynamic", "jasmine",
+    "node"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

@@ -33,6 +33,14 @@ export class EnchereService {
   getAllArticles(): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:3002/article/getAll`);
   }
+  getAdminById(adminId: number): Observable<any> {
+    return this.http.get<any>(`http://localhost:3003/admins/${adminId}`);
+  }
+
+  // Méthode pour récupérer les détails du partenaire par son ID
+  getPartEnById(partEnId: number): Observable<any> {
+    return this.http.get<any>(`http://localhost:3002/parten/${partEnId}`);
+  }
   getArticleById(id: number): Observable<Article> {
     return this.http.get<Article>(`http://localhost:3002/article/${id}`);
   }
@@ -58,6 +66,7 @@ export class EnchereService {
       catchError(this.handleError)
     );
   }
+
   addPart_En(partEn: Part_En): Observable<Part_En> {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -70,10 +79,22 @@ export class EnchereService {
     console.error('An error occurred:', error);
     return throwError('Something bad happened; please try again later.');
   }
-  updateEnchere(iden: number, enchere: Enchere): Observable<Enchere> {
-    return this.http.post<Enchere>(`http://localhost:3002/enchere/UpdateEnchere/${iden}`, enchere);
+ 
+  updateIdEnchers(articleId: number, enchereId: number): Observable<any> {
+    return this.http.put(`http://localhost:3002/article/updateIdEnchers/${articleId}/${enchereId}`, null).pipe(
+        catchError(this.handleError)
+    );
+}
+updateIdEncherss(articleId: number, enchereId: number): Observable<any> {
+  return this.http.put(`http://localhost:3002/article/${articleId}/enchere/${enchereId}`, null).pipe(
+      catchError(this.handleError)
+  );
+}
+  updateEnchere(id: number, updatedEnchere: Enchere): Observable<Enchere> {
+    const url = `http://localhost:3002/enchere/UpdateEnchere/${id}`;
+    return this.http.post<Enchere>(url, updatedEnchere);
   }
-
+  
   deleteEnchere(iden: number): Observable<string> {
     return this.http.delete<string>(`http://localhost:3002/enchere/deleteEnchere/${iden}`).pipe(
       catchError(this.handleError)
