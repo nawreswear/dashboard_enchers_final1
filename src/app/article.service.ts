@@ -28,9 +28,10 @@ interface Categorie {
 })
 export class ArticleService {
   private baseUrl = 'http://localhost:3002/article'; 
+  private baseUrl2 = 'http://localhost:3004/panier';  
 
   constructor(private http: HttpClient) { }
-  private baseUrl2 = 'http://localhost:3004/panier'; 
+
   getAllCategories(): Observable<Categorie[]> {
     return this.http.get<Categorie[]>(`http://localhost:3002/categorie/getallcategories`);
   }
@@ -85,25 +86,11 @@ updateArticleStatut(id: number, statut: string): Observable<any> {
     return this.http.get<number>(`http://localhost:3003/api/${userName}`);
   }
 
-  addArticleToCart(article: Article, quantitecde: number): Observable<any> {
-    const url = `${this.baseUrl2}/addToCart`;
-    const httpOptions = {
-      headers: new HttpHeaders({
-      'Content-Type': 'application/json'
-      })
-      }
-    return this.http.post<any>(url, { article, quantitecde }).pipe(
-      catchError(error => {
-        console.error('Une erreur s\'est produite lors de l\'ajout de l\'article au panier:', error);
-        return throwError(error);
-      })
-    );
-  }
   ajouterArticleAuPanier(panierId: number, articleId: number): Observable<Panier> {
-    return this.http.post<Panier>(`http://localhost:3002/articles/${panierId}/ajouter-article`, articleId);
+    return this.http.post<Panier>(`http://localhost:3004/articles/${panierId}/${articleId}/ajouterarticle`,null);
   }
-  supprimerArticleDuPanier(panierId: number, articleId: number): Observable<Panier> {
-    return this.http.delete<Panier>(`http://localhost:3002/articles/${panierId}/supprimer-article`, { body: articleId });
+  supprimerArticleDuPanier(panierId: number, articleId: number): Observable<any> {
+    return this.http.delete<any>(`http://localhost:3004/articles/${panierId}/supprimer-article/${articleId}`);
   }
 
   addPrixVenteForArticle(enchereId: number, articleId: number, prixvente: number): Observable<any> {

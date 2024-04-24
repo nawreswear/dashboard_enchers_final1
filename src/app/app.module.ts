@@ -53,6 +53,7 @@ import { PanierComponent } from './shopping-cart/cards/panier/panier.component';
 import { CardsComponent } from './shopping-cart/cards/cards.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PartEnComponent } from './admin-dashboard/part-en/part-en.component';
+import { PanierService } from './shopping-cart/cards/panier.service';
 
 
 const routes: Route[] = [

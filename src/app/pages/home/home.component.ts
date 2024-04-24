@@ -13,6 +13,7 @@ import { ArticleService } from 'src/app/article.service';
 import { tap, map, switchMap } from 'rxjs/operators';
 import { CardsComponent } from 'src/app/shopping-cart/cards/cards.component';
 import { ToastrService } from 'ngx-toastr';
+import { PanierService } from 'src/app/shopping-cart/cards/panier.service';
 interface Categorie {
   id: number;
   titre: string;
@@ -90,7 +91,7 @@ export class HomeComponent implements OnInit {
     private snackBar: MatSnackBar,  public router: Router,public authService: AuthService,
    private articleService: ArticleService,
    private authenticationService: AuthService,
-   private toastrService: ToastrService,
+   private toastrService: ToastrService, private  panierService :PanierService,
    private enchereService: EnchersServiceService,private categoriesService:CategoriesService
   ) {
     this.myForm = this.createEnchereForm();
@@ -361,25 +362,10 @@ selectedArticle: Article | null = null;
   public articlesForEnchere: Article[] = [];
   public articlesForEnchereMap: { [enchereId: number]: Article[] } = {};
   public articlesForEnchereMapp: { [enchereId: number]: Articlee[] } = {};
- // Déclarez la propriété isLoggedInSubject avec la bonne visibilité
  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
  authStatus = this.isLoggedInSubject.asObservable();
   
- addToCart(article: any) {
-   const quantity = 1; // Définissez la quantité de l'article à ajouter au panier
-   this.articleService.addArticleToCart(article, quantity).subscribe(
-       (response) => {
-           // Gérer la réponse du service si nécessaire
-           console.log("Article ajouté au panier avec succès :", response);
-       },
-       (error) => {
-           // Gérer l'erreur si nécessaire
-           console.error("Erreur lors de l'ajout de l'article au panier :", error);
-       }
-   );
-   const articleId = article.id; // Récupération de l'ID de l'article ajouté
-   console.log("ID de l'article ajouté au panier :", articleId);
-}
+ 
 createEnchereForm(): FormGroup {
   return this.formBuilder.group({
     id: [0],
@@ -485,10 +471,6 @@ joinMeeting(meetingId: string) {
 
     return `${year}-${month}-${day} T ${hours}:${minutes}`;
 }
-
-/*isLoggedIn(): boolean {
-  return !!this.token.value;
-}*/
 
 getAllArticles() {
   this.articleService.getAllArticles().subscribe(

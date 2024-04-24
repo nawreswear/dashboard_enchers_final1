@@ -6,6 +6,8 @@ import { ArticleService } from 'src/app/article.service';
 import { BehaviorSubject, Observable, map, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from 'src/app/_service/user';
+import { EnchersServiceService } from 'src/app/enchers-service.service';
+import { PartEnService } from 'src/app/part-en.service';
 
 @Component({
   selector: 'app-panier',
@@ -16,13 +18,15 @@ export class PanierComponent implements OnInit {
   @Input() panier: Panier = {} as Panier;
   idRequis: number;
   userId: number | null = null;
+  panierDetails: any[] = [];
  // userId$: Observable<User | null> = this.getUserIdObservable();
   token = new BehaviorSubject<string | null>(null);
   tokenObs$ = this.token.asObservable();
   collapsed: boolean = true;
   parten: any | null = null;
-
-  constructor(private panierService: PanierService, private articleService: ArticleService,
+ public panierItems: any[] = [];
+  constructor(public panierService: PanierService, private articleService: ArticleService,
+    private encherService :  EnchersServiceService, private  partEnService : PartEnService,
     private router: Router) { 
     this.idRequis = 0; 
     const storedToken = localStorage.getItem('token');
@@ -41,14 +45,116 @@ export class PanierComponent implements OnInit {
     });
   }
 
+  ajouterArticle(article: any) {
+    this.panierItems.push(article);
+  }
 
+  // Supprimer un article du panier
+  supprimerArticle(index: number) {
+    this.panierItems.splice(index, 1);
+  }
+  addToCart(article: any) {
+    // Incrémentez la quantité à chaque clic sur "Add to Cart"
+    if (!article.quantiter) {
+        article.quantiter = 1; // Si la quantité n'est pas définie, initialisez-la à 1
+    } else {
+        article.quantiter++; // Incrémentez la quantité
+    }
+
+    // Récupérer l'ID de l'utilisateur
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+        const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+        if (tokenPayload.sub) {
+            const username = tokenPayload.sub;
+            this.encherService.findUserIdByNom(username).subscribe(
+                userId => {
+                    console.log('ID de l\'utilisateur trouvé :', userId);
+                    // Maintenant, vous avez l'ID de l'utilisateur, vous pouvez récupérer le partenaire ID
+                    this.partEnService.getPartenIdByUserId(userId).subscribe(
+                        partenId => {
+                            console.log('ID du partenaire trouvé :', partenId);
+                            // Appelez votre service pour créer un nouveau panier
+                            this.panierService.addPanier(partenId).subscribe(
+                                (panierId: number) => {
+                                    // Appelez votre service pour ajouter l'article au panier avec la quantité mise à jour
+                                    this.panierService.addToCart(article.id, panierId, partenId).subscribe(
+                                        (response) => { // Gérer la réponse du service si nécessaire
+                                            console.log("Article ajouté au panier avec succès :", response);
+                                            article.quantiter++; 
+                                        },
+                                        (error) => { // Gérer l'erreur si nécessaire
+                                            console.error("Erreur lors de l'ajout de l'article au panier :", error);
+                                        }
+                                    );
+                                },
+                                (error) => {
+                                    console.error("Erreur lors de la création du panier :", error);
+                                }
+                            );
+                        },
+                        error => {
+                            console.error('Erreur lors de la récupération de l\'ID du partenaire :', error);
+                        }
+                    );
+                },
+                error => {
+                    console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur :', error);
+                }
+            );
+        }
+    }
+}
+
+
+  // Calculer le total du panier
+  public calculerTotal(): number {
+    let total = 0;
+    for (const item of this.panierItems) {
+      total += item.prix;
+    }
+    return total;
+  }
   @Input() ArticleAdded: any;
 
   ngOnInit() {
-    
+   // this.getPartenIdByUserId();
+    this.getPanierDetails(1);
   }
 
-
+  getPanierDetails(partenId: number): void {
+    this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
+      (paniers: Panier[]) => {
+        if (paniers) {
+          console.log("Paniers récupérés :", paniers);
+          this.panierDetails = paniers; // Assignez les paniers récupérés à la variable panierDetails
+        } else {
+          console.error("Aucun panier trouvé pour le partenaire avec l'ID :", partenId);
+        }
+      },
+      (error: any) => {
+        console.error("Erreur lors de la récupération des paniers :", error);
+      }
+    );
+  }
+  panierDetailss: Panier[] = []; 
+  getPanierAvecIdPartenaire(partenId: number) {
+    this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
+      (panier: any) => {
+        if (panier && panier.items) {
+          console.log("this.panierDetails =", panier);
+          console.log("this.panierDetails.items =", panier.items);
+          this.panierDetails = panier;
+        } else {
+          // Gérer le cas où 'panier' ou 'panier.items' est undefined
+          console.error("Le panier ou les articles du panier sont indéfinis.");
+        }
+      },
+      (error: any) => {
+        console.error("Erreur lors de la récupération du panier :", error);
+      }
+    );
+  }
  getUserIdObservable(): Observable<User | null> {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -87,47 +193,23 @@ export class PanierComponent implements OnInit {
       }
     );
   }
-  /*addToPanier(panierId: number, articleId: number) {
-    // Récupérer l'article correspondant à l'ID
-    this.articleService.getArticleById(articleId).subscribe(
-      (article) => {
-        // Vérifier si l'article a été récupéré avec succès
-        if (article) {
-          // Vérifier que la propriété prix de l'article est un nombre
-          if (typeof article.prix === 'number') {
-            // Appeler la méthode addToCart() avec l'article et l'ID du panier
-            this.panierService.addToCart(article, panierId).subscribe(
-              (response) => {
-                console.log('Article ajouté au panier avec succès :', response);
-                // Traitez la réponse comme vous le souhaitez, par exemple mettre à jour l'affichage ou afficher un message de confirmation.
-              },
-              (error) => {
-                console.error('Une erreur s\'est produite lors de l\'ajout de l\'article au panier :', error);
-                // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
-              }
-            );
-          } else {
-            console.error('La propriété prix de l\'article n\'est pas un nombre.');
-            // Traitez le cas où la propriété prix de l'article n'est pas un nombre.
-          }
-        } else {
-          console.error('L\'article correspondant à l\'ID n\'a pas été trouvé.');
-          // Traitez le cas où l'article n'a pas été trouvé, par exemple afficher un message d'erreur à l'utilisateur.
-        }
-      },
-      (error) => {
-        console.error('Une erreur s\'est produite lors de la récupération de l\'article :', error);
-        // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
-      }
-    );
-  }
-  */
-  
-  
   removeFromPanier(panierId: number, articleId: number) {
     this.articleService.supprimerArticleDuPanier(panierId, articleId).subscribe(
       (response) => {
         console.log('Article supprimé du panier avec succès :', response);
+        
+        // Après avoir supprimé l'article du panier, appeler deletePanier
+        this.panierService.deletePanier(panierId).subscribe(
+          (deleteResponse) => {
+            console.log('Panier supprimé avec succès :', deleteResponse);
+            // Traitez la réponse comme vous le souhaitez
+          },
+          (deleteError) => {
+            console.error('Une erreur s\'est produite lors de la suppression du panier :', deleteError);
+            // Traitez l'erreur comme vous le souhaitez
+          }
+        );
+        
         // Traitez la réponse comme vous le souhaitez, par exemple mettre à jour l'affichage ou afficher un message de confirmation.
       },
       (error) => {
@@ -136,53 +218,5 @@ export class PanierComponent implements OnInit {
       }
     );
   }
-  // Call the addPanier method here
- /* addToPanier() {
-    // Create a new Panier object with necessary data
-    const panier: Panier = {
-      id: 0,
-      totalP: 0,
-      quantitecde:0,
-      date: new Date(), // Assign a valid Date object here
-      paiements: [],
-      articles: [], // Assign null or an instance of Lignepanier
-      partEn: null // Assign null or an instance of PartEn
-    };
   
-    // Call the addPanier method from the PanierService
-    this.panierService.addPanier(panier).subscribe(
-      (response) => {
-        // Handle successful response here
-      },
-      (error) => {
-        // Handle error here
-      }
-    );
-  }*/
 }
-  
-/*checkoutProduct() {
-    this.makePayment(this.total, this.lignePanier);
-  }
-  makePayment(total: number, articles: Lignepanier[]) {
-    // Souscrire à getUserIdObservable() pour obtenir le user
-    this.getUserIdObservable().subscribe((user: User | null) => {
-        const panier: Panier = {
-            id: 0,
-            TotalP: total,
-            date: new Date(),
-            paiements: [], // Aucun paiement initial
-            lignepanier: articles[0], // Par exemple, si vous avez besoin du premier élément de la liste
-            parten: this.parten // Utilisation de la variable 'parten' pour résoudre l'erreur
-        };
-
-        // Appeler la méthode addPanier du service PanierService
-        this.panierService.addPanier(panier).subscribe((response) => {
-            console.log("Panier ajouté avec succès :", response);
-            // Vous pouvez gérer la réponse ici
-        }, (error) => {
-            console.error("Erreur lors de l'ajout du panier :", error);
-            // Vous pouvez gérer l'erreur ici
-        });
-    });
-}*/

@@ -45,4 +45,7 @@ export class PartEnService {
     getPartenIdByEnchere(enchereId: number): Observable<number> {
       return this.http.get<number>(`${this.baseUrl}/getPartenIdByEnchere/${enchereId}`);
     }
+    getPartenIdByUserId(userId: number): Observable<number> {
+      return this.http.get<number>(`${this.baseUrl}/${userId}/parten-id`);
+    }
   }

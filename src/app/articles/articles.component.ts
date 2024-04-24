@@ -8,6 +8,10 @@ import { AuthService } from '../_service/auth.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
+import { PanierService } from '../shopping-cart/cards/panier.service';
+import { EnchereService } from '../admin-dashboard/enchers-service.service';
+import { EnchersServiceService } from '../enchers-service.service';
+import { PartEnService } from '../part-en.service';
 
 interface Article {
   id: number;
@@ -80,7 +84,10 @@ export class ArticlesComponent implements OnInit {
     private formBuilder: FormBuilder, public authService: AuthService,
     private articleService: ArticleService, public router: Router,
     private snackBar: MatSnackBar,
-    private http: HttpClient // Injection de HttpClient
+    private http: HttpClient,
+    private  panierService :PanierService,
+    private encherService :  EnchersServiceService,
+   private  partEnService : PartEnService
   ) {
     this.userType = this.authService.getUserType();
     this.myForm = this.formBuilder.group({
@@ -113,6 +120,32 @@ export class ArticlesComponent implements OnInit {
   }
 
   ngOnInit() {
+    const storedToken = localStorage.getItem('token');
+if (storedToken) {
+  const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+  if (tokenPayload.sub) {
+    const username = tokenPayload.sub;
+    this.encherService.findUserIdByNom(username).subscribe(
+      userId => {
+        console.log('ID de l\'utilisateur trouvé :', userId);
+        // Maintenant, vous avez l'ID de l'utilisateur, vous pouvez récupérer le partenaire ID
+        this.partEnService.getPartenIdByUserId(userId).subscribe(
+          partenId => {
+            console.log('ID du partenaire trouvé :', partenId);
+            // Faites ce que vous devez faire avec l'ID du partenaire ici
+          },
+          error => {
+            console.error('Erreur lors de la récupération de l\'ID du partenaire :', error);
+          }
+        
+        );
+      },
+      error => {
+        console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur :', error);
+      }
+    );
+  }
+}
     this.initForm();
     this.getAllArticles();
     this.getAllCategories();
@@ -159,31 +192,60 @@ export class ArticlesComponent implements OnInit {
   
   }
    
-  ArticleAdded :any[]=[]
-  
+
   addToCart(article: any) {
     // Incrémentez la quantité à chaque clic sur "Add to Cart"
-    if (!article.quantity) {
-        article.quantity = 1; // Si la quantité n'est pas définie, initialisez-la à 1
+    if (!article.quantiter) {
+        article.quantiter = 1; // Si la quantité n'est pas définie, initialisez-la à 1
     } else {
-        article.quantity++; // Incrémentez la quantité
+        article.quantiter++; // Incrémentez la quantité
     }
 
-    // Appelez votre service pour ajouter l'article au panier avec la quantité mise à jour
-    this.articleService.addArticleToCart(article,article.quantity).subscribe(
-        (response) => {
-            // Gérer la réponse du service si nécessaire
-            console.log("Article ajouté au panier avec succès :", response);
-        },
-        (error) => {
-            // Gérer l'erreur si nécessaire
-            console.error("Erreur lors de l'ajout de l'article au panier :", error);
+    // Récupérer l'ID de l'utilisateur
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+        const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+        if (tokenPayload.sub) {
+            const username = tokenPayload.sub;
+            this.encherService.findUserIdByNom(username).subscribe(
+                userId => {
+                    console.log('ID de l\'utilisateur trouvé :', userId);
+                    // Maintenant, vous avez l'ID de l'utilisateur, vous pouvez récupérer le partenaire ID
+                    this.partEnService.getPartenIdByUserId(userId).subscribe(
+                        partenId => {
+                            console.log('ID du partenaire trouvé :', partenId);
+                            // Appelez votre service pour créer un nouveau panier
+                            this.panierService.addPanier(partenId).subscribe(
+                                (panierId: number) => {
+                                    // Appelez votre service pour ajouter l'article au panier avec la quantité mise à jour
+                                    this.panierService.addToCart(article.id, panierId, partenId).subscribe(
+                                        (response) => { // Gérer la réponse du service si nécessaire
+                                            console.log("Article ajouté au panier avec succès :", response);
+                                            article.quantiter++; 
+                                        },
+                                        (error) => { // Gérer l'erreur si nécessaire
+                                            console.error("Erreur lors de l'ajout de l'article au panier :", error);
+                                        }
+                                    );
+                                },
+                                (error) => {
+                                    console.error("Erreur lors de la création du panier :", error);
+                                }
+                            );
+                        },
+                        error => {
+                            console.error('Erreur lors de la récupération de l\'ID du partenaire :', error);
+                        }
+                    );
+                },
+                error => {
+                    console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur :', error);
+                }
+            );
         }
-    );
-
-    const articleId = article.id; // Récupération de l'ID de l'article ajouté
-    console.log("ID de l'article ajouté au panier :", articleId);
+    }
 }
+
 
   getAllArticles() {
     this.articleService.getAllArticles().subscribe(
@@ -341,7 +403,6 @@ editArticleFunc(article: Article) {
     this.myForm.reset(); // Réinitialise le formulaire
     this.photoUrl = '';
   }
-
   onSubmit() {
     if (this.editMode) {
       console.log("avant onSubmit - editMode", this.editMode);
@@ -353,8 +414,7 @@ editArticleFunc(article: Article) {
     } else {
       this.createArticle();
     }
-  }  
-  
+  }   
   updateArticle(updatedArticle: Article) {
     if (this.editForm && this.editForm.valid && this.editArticle) {
       const updatedArticleData: Article = {
@@ -395,81 +455,7 @@ editArticleFunc(article: Article) {
       );
     }
   }
-
-  /*onSubmit() {
-    console.log("avant onSubmit - editMode :", this.editMode); // Ajouter un message pour indiquer le début de la fonction onSubmit et afficher la valeur de editMode
-    if (this.editMode) {
-      console.log("Dans editMode"); // Ajouter un message pour indiquer que le mode édition est activé
-      if (this.editForm && this.editForm.valid && this.editArticle) {
-        console.log("Formulaire d'édition valide"); // Ajouter un message pour indiquer que le formulaire d'édition est valide
-        console.log("editArticle :", this.editArticle); // Afficher les détails de l'article en cours d'édition
-        // Récupérer l'ID du vendeur à partir de son nom
-        this.articleService.getUserIdByName(this.editForm.value.nomVendeur).subscribe(
-          (userId: number) => {
-            console.log("ID du vendeur récupéré :", userId); // Afficher l'ID du vendeur récupéré
-            // Appeler la méthode updateArticle avec l'ID du vendeur récupéré
-            if (this.editArticle !== null) {
-              this.updateArticle(this.editArticle, userId);
-            }
-          },
-          (error: HttpErrorResponse) => {
-            console.error('Erreur lors de la récupération de l\'ID du vendeur:', error);
-            this.snackBar.open('Erreur lors de la récupération de l\'ID du vendeur: ' + error.message, 'Fermer', {
-              duration: 3000
-            });
-          }
-        );
-      } else {
-        console.log("Formulaire d'édition invalide"); // Ajouter un message pour indiquer que le formulaire d'édition est invalide
-      }
-    } else {
-      console.log("Hors editMode"); // Ajouter un message pour indiquer que le mode édition n'est pas activé
-      this.createArticle();
-    }
-  }
-
-  updateArticle(updatedArticle: Article, vendeurId: number) {
-    if (this.editForm && this.editForm.valid && this.editArticle) {
-      const updatedArticleData: Article = {
-        id: this.editArticle.id,
-        titre: this.editForm.value.titre,
-        description: this.editForm.value.description,
-        photo: this.editForm.value.photo,
-        prix: this.editForm.value.prix,
-        prixvente: this.editForm.value.prixvente,
-        livrable: this.editForm.value.livrable,
-        statut: this.editForm.value.statut,
-        quantiter: this.editForm.value.quantiter,
-        categorie: {
-          id: this.editForm.value.categorie,
-          titre: '',
-          description: '',
-          image: ''
-        },
-        vendeur: { id: vendeurId } // Utiliser l'ID du vendeur récupéré
-      };
-      this.articleService.updateArticleForVendeur(vendeurId, updatedArticleData.id, updatedArticleData).subscribe(
-        Response => {
-          this.editMode = false;
-          this.editArticle = null;
-          this.editForm.reset();
-          this.photoUrl = '';
-          this.getAllArticles();
-          this.snackBar.open('Article mis à jour avec succès!', 'Fermer', {
-            duration: 3000
-          });
-        },
-        (error: HttpErrorResponse) => {
-          console.error('Erreur lors de la mise à jour de l\'article:', error);
-          this.snackBar.open('Erreur lors de la mise à jour de l\'article: ' + error.message, 'Fermer', {
-            duration: 3000
-          });
-        }
-      );
-    }
-  }*/
-  
-  private checkToken() {
+   private checkToken() {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
@@ -487,20 +473,6 @@ editArticleFunc(article: Article) {
       },
     });
   }
-  /*updateArticle(article: Article) {
-    if (this.editForm && this.editForm.valid && article) {
-      this.articleService.updateArticle(article.id.toString(), article).subscribe(
-        () => {
-          console.log("Article mis à jour avec succès !");
-          // Effectuez d'autres actions si nécessaire
-        },
-        (error: HttpErrorResponse) => {
-          console.error("Erreur lors de la mise à jour de l'article:", error);
-          // Gérer l'erreur comme nécessaire
-        }
-      );
-    }
-  }*/
   
 
  

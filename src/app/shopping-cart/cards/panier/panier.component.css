@@ -1,0 +1,61 @@
+/* Styles pour la carte du panier */
+.card {
+    border: none; /* Supprimer la bordure par défaut */
+  }
+  
+  .card-header {
+    background-color: #343a40; /* Couleur de fond pour l'en-tête */
+    border-bottom: none; /* Supprimer la bordure inférieure */
+  }
+  
+  .card-body {
+    padding: 1.5rem; /* Espacement intérieur du corps de la carte */
+  }
+  
+  .card-footer {
+    background-color: #fff; /* Couleur de fond pour le pied de carte */
+    border-top: none; /* Supprimer la bordure supérieure */
+  }
+  
+  /* Styles pour le tableau des détails du panier */
+  .table {
+    border-radius: 0.25rem; /* Coins arrondis pour le tableau */
+  }
+  
+  .table thead th {
+    border-top: none; /* Supprimer la bordure supérieure des cellules d'en-tête */
+  }
+  
+  .table th, .table td {
+    border-color: #98999b; /* Couleur de la bordure des cellules */
+  }
+  
+  /* Styles pour les boutons */
+  .btn {
+    border-radius: 0.25rem; /* Coins arrondis pour les boutons */
+  }
+  
+  .btn-success {
+    background-color: #28a745; /* Couleur de fond pour les boutons de succès */
+    border-color: #28a745; /* Couleur de bordure pour les boutons de succès */
+  }
+  
+  .btn-success:hover {
+    background-color: #218838; /* Couleur de fond au survol des boutons de succès */
+    border-color: #1e7e34; /* Couleur de bordure au survol des boutons de succès */
+  }
+  
+  /* Styles pour le message de panier vide */
+  .text-center {
+    margin-top: 2rem; /* Espacement en haut du message */
+  }
+  
+  /* Styles pour les liens */
+  a {
+    color: #007bff; /* Couleur du lien */
+  }
+  
+  a:hover {
+    color: #0056b3; /* Couleur du lien au survol */
+  }
+  

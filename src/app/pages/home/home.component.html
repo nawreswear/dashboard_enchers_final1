@@ -2,8 +2,8 @@
   <!-- Grande image -->
   <div class="navbar-images">
     <button (click)="previousImage()" class="nav-arrow">&#8249;</button>
-    <img [src]="categories[currentImageIndex].image" class="category-image" alt="Image de catégorie">
-    <h3 class="category-title">{{ categories[currentImageIndex].titre }}</h3>
+    <img [src]="categories[currentImageIndex]?.image" class="category-image" alt="Image de catégorie">
+    <h3 class="category-title">{{ categories[currentImageIndex]?.titre }}</h3>
     <button (click)="nextImage()" class="nav-arrow">&#8250;</button>
 </div>
 
@@ -66,7 +66,7 @@
           <div>Catégorie: <span class="article-price">{{ article.categorie.titre }}</span></div>
           <div  class="edit-button-container">
           <button class="primary" (click)="showArticleDetails(article)">Détail</button>
-          <button class="secondary" (click)="addToCart(article)"*ngIf="userType === 'user' || userType === 'vendeur'" class="secondary">
+          <button class="secondary" *ngIf="userType === 'user' || userType === 'vendeur'"  class="secondary"><!--(click)="addToCart(article)"-->
             Add To cart
            </button>
         </div>

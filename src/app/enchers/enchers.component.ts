@@ -53,6 +53,8 @@ export class EnchersuserComponent implements OnInit {
   '(\\#[-a-z\\d_]*)?$','i'); // Fragment
   currentUser: User | null = null;
   currentUserr: string | undefined;
+ 
+
 // Déclaration de la fonction dans la classe de composant
 parseDate(dateString: string): number | undefined {
   return parseInt(dateString, 10); // Convertit la chaîne en nombre entier
@@ -63,6 +65,8 @@ parseDate(dateString: string): number | undefined {
   public loading: boolean = false;
   public articles: Article[] = [];
   public editMode: boolean = false;
+  public showParticipateButton: boolean = true;
+
   public editForm!: FormGroup;
   public partens: any[] = [];
   public admins: any[] = [];
@@ -97,7 +101,6 @@ parseDate(dateString: string): number | undefined {
     this.prixVenteForm = this.formBuilder.group({
       prixvente: ['', Validators.required] 
     });
-    
     this.editForm = this.formBuilder.group({
       id: [0],
       dateFin: [new Date()],
@@ -201,12 +204,15 @@ participerEnchere(userId: number, enchereId: number) {
     () => {
       this.cookieService.set('userId', userId.toString());
       const userIdd = parseInt(this.cookieService.get('userId') || '0');
-      console.log("ID de l'utilisateur:", userIdd);
-      // Mettez à jour les données après la participation à l'enchère
-      this.getAllEncheres(); // Met à jour la liste des enchères après la participation
+      console.log("ID de l'utilisateur userIdd:", userIdd);
+       // Mettez à jour les données après la participation à l'enchère
+      this.showParticipateButton = false;
+      this.getAllEncheres(); 
+      // Met à jour la liste des enchères après la participation
       this.snackBar.open('Vous avez participé à l\'enchère avec succès!', 'Fermer', {
         duration: 3000
       });
+
     },
     (error: HttpErrorResponse) => {
       if (error.status !== 200) {
@@ -236,6 +242,12 @@ participerEnchere(userId: number, enchereId: number) {
         // Appel de la méthode pour récupérer les articles pour chaque enchère
        this.getArticlesForEnchere(enchere.id);
       }
+    });
+    const allCookies: { [key: string]: string } = this.cookieService.getAll();
+    // Parcourir toutes les clés des cookies
+    Object.keys(allCookies).forEach(key => {
+      // Afficher le contenu de chaque cookie dans la console
+      console.log('Contenu du cookie :', `${key}: ${allCookies[key]}`);
     });
   }
 
@@ -350,7 +362,6 @@ getAllArticles() {
 
 
   cancelCreation() {
-    // Réinitialisez le formulaire d'enchère
     this.myForm.reset();
     this.showAddForm=false;
   }
@@ -491,9 +502,10 @@ toggleAddPriceForm(articleId: number | undefined) {
                 () => {
                   // Enregistrez l'ID du participant dans une cookie
                   this.cookieService.set('participantId', participantId.toString());
+                  console.log('participantIdparticipantId',this.cookieService.set('participantId', participantId.toString()))
                 // Réinitialisez le formulaire et masquez le formulaire de prix de vente
                   this.prixVenteForm.reset();
-                  this.showAddPriceForm = false;
+                //  this.showAddPriceForm = false;
 
                   // Mettre à jour la liste d'enchères après l'ajout du prix de vente
                   this.updateEncheresAfterPrixVente();

@@ -6,10 +6,9 @@ import { User } from "src/app/_service/user";
 export interface Panier {
   id: number;
   totalP: number;
-  date: Date;
   quantitecde: number;
   paiements: Paiement[];
-  partEn: PartEn;
+  partEn:  { id: number };
   articles: Article[];
 }
 export interface PartEn {
@@ -57,13 +56,23 @@ export class PanierService {
   })
   }
 constructor(private httpClient: HttpClient) { }
-addPanier(panier: Panier): Observable<Panier> {
-  return this.httpClient.post<Panier>(`${this.apiURL}/addPanier`, panier, this.httpOptions);
+
+addPanier(partenId: number): Observable<number> {
+  return this.httpClient.post<number>(`http://localhost:3004/panier/addPanier/${partenId}`, {});
 }
-addToCart(article: Article, panierId: number): Observable<string> {
-  const url = `${this.apiURL}/addToCart`;
-  const body = { article, panierId };
-  return this.httpClient.post<string>(url, body);
+supprimerArticleDuPanier(panierId: number, articleId: number): Observable<any> {
+  return this.httpClient.delete<any>(`http://localhost:3004/articles/${panierId}/supprimer-article/${articleId}`);
+}
+getPaniersByPartenaire(partenId: number): Observable<Panier[]> {
+  return this.httpClient.get<Panier[]>(`http://localhost:3004/panier/${partenId}`);
+}
+
+addToCart(articleId: number, panierId: number, partenId: number): Observable<Panier> {
+
+  return this.httpClient.post<Panier>(`http://localhost:3004/articles/${articleId}/${panierId}/${partenId}/ajouter-article`, {});
+}
+getPanierAvecIdPartenaire(partenId: number): Observable<Panier[]> {
+  return this.httpClient.get<any[]>(`http://localhost:3004/panier/partenaire/${partenId}`);
 }
 
 getAllPaniers(): Observable<Panier[]> {

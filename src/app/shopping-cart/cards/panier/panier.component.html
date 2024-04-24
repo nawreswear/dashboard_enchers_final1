@@ -1,35 +1,55 @@
-<div class="card bg-dark text-white mb-3" style="max-width: 50rem;" id="htmlData">
-  <div class="card-header text-center">Panier</div>
+<div class="card border-dark mb-3" style="max-width: 50rem; margin-top: 150%;" id="htmlData">
+  <div class="card-header bg-dark text-white text-center">
+    <h5 class="mb-0">Détails du Panier</h5>
+  </div>
   <div class="card-body">
-    <table class="table table-dark">
-      <thead>
+    <table class="table table-striped table-hover">
+      <thead class="thead-dark">
         <tr>
-          <th scope="col">Titre</th>
           <th scope="col">Quantité</th>
-          <th scope="col">Prix</th>
+          <th scope="col">Articles</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let article of panier.articles">
-          <td>{{ article.titre }}</td>
-          <td>{{ article.quantiter }}</td>
-          <td>{{ article.prix }}</td>
-        </tr>
+        <ng-container *ngIf="panierDetails && panierDetails.length > 0; else emptyPanier">
+          <tr *ngFor="let item of panierDetails">
+            <td>{{ item.quantitecde }}</td>
+            <td>
+              <ul>
+                <ng-container *ngFor="let article of item.articles">
+                  <li>
+                    {{ article.titre }} - {{ article.prix }} DT 
+                    <button class="btn btn-sm btn-success" (click)="addToCart(article)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="removeFromPanier(item.id, article.id)">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </li>
+                </ng-container>
+              </ul>
+            </td>
+            <td></td> <!-- Espace réservé pour les actions -->
+          </tr>
+        </ng-container>
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2">Total:</td>
-          <td style="font-weight: bold">{{ panier.totalP }} DT</td>
-        </tr>
-      </tfoot>
     </table>
-    <div class="d-flex justify-content-end">
-      <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3" [disabled]="panier.articles.length === 0">
-        Payer
-      </button>
-      <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3 ms-3" (click)="openPDF()" [disabled]="panier.articles.length === 0">
-        Imprimer le PDF
-      </button>
-    </div>
+  </div>
+
+  <div class="d-flex justify-content-end">
+    <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3" [disabled]="panierDetails.length === 0">
+      Payer
+    </button>
+    <button style="background-color: rgb(2, 97, 26);" class="btn btn-success btn-block mt-3 ms-3" (click)="openPDF()" [disabled]="panierDetails.length === 0">
+      Imprimer le PDF
+    </button>
+    <button style="background-color: rgb(2, 97, 26);" class="btn btn-light btn-block mt-3 ms-3" [disabled]="panierDetails.length === 0">Checkout</button>
   </div>
 </div>
+
+<ng-template #emptyPanier>
+  <div class="text-center">
+    <p>Panier vide</p>
+  </div>
+</ng-template>
