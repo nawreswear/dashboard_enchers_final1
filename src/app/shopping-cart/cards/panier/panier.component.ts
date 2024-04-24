@@ -118,43 +118,56 @@ export class PanierComponent implements OnInit {
   @Input() ArticleAdded: any;
 
   ngOnInit() {
-   // this.getPartenIdByUserId();
-    this.getPanierDetails(1);
-  }
-
-  getPanierDetails(partenId: number): void {
-    this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
-      (paniers: Panier[]) => {
-        if (paniers) {
-          console.log("Paniers récupérés :", paniers);
-          this.panierDetails = paniers; // Assignez les paniers récupérés à la variable panierDetails
-        } else {
-          console.error("Aucun panier trouvé pour le partenaire avec l'ID :", partenId);
-        }
-      },
-      (error: any) => {
-        console.error("Erreur lors de la récupération des paniers :", error);
-      }
-    );
-  }
-  panierDetailss: Panier[] = []; 
-  getPanierAvecIdPartenaire(partenId: number) {
-    this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
-      (panier: any) => {
-        if (panier && panier.items) {
-          console.log("this.panierDetails =", panier);
-          console.log("this.panierDetails.items =", panier.items);
-          this.panierDetails = panier;
-        } else {
-          // Gérer le cas où 'panier' ou 'panier.items' est undefined
-          console.error("Le panier ou les articles du panier sont indéfinis.");
-        }
-      },
-      (error: any) => {
-        console.error("Erreur lors de la récupération du panier :", error);
-      }
-    );
-  }
+    this.getPartenIdByUserId();
+ }
+ 
+ getPanierDetails(partenId: number): void {
+     this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
+       (paniers: Panier[]) => {
+         if (paniers) {
+           console.log("Paniers récupérés :", paniers);
+           this.panierDetails = paniers; // Assignez les paniers récupérés à la variable panierDetails
+         } else {
+           console.error("Aucun panier trouvé pour le partenaire avec l'ID :", partenId);
+         }
+       },
+       (error: any) => {
+         console.error("Erreur lors de la récupération des paniers :", error);
+       }
+     );
+ }
+ 
+ showCartModal: boolean = false;
+ 
+ getPartenIdByUserId() {
+   const storedToken = localStorage.getItem('token');
+   if (storedToken) {
+     const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+     if (tokenPayload.sub) {
+       const username = tokenPayload.sub;
+       this.encherService.findUserIdByNom(username).subscribe(
+         userId => {
+           console.log('ID de l\'utilisateur trouvé :', userId);
+           // Maintenant, vous avez l'ID de l'utilisateur, vous pouvez récupérer le partenaire ID
+           this.partEnService.getPartenIdByUserId(userId).subscribe(
+             partenId => {
+               console.log('ID du partenaire trouvé :', partenId);
+               // Une fois que vous avez récupéré l'ID du partenaire, vous pouvez appeler la méthode pour récupérer le panier avec cet ID
+               this.getPanierDetails(partenId);
+             },
+             error => {
+               console.error('Erreur lors de la récupération de l\'ID du partenaire :', error);
+             }
+           );
+         },
+         error => {
+           console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur :', error);
+         }
+       );
+     }
+   }
+ }
+ 
  getUserIdObservable(): Observable<User | null> {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
