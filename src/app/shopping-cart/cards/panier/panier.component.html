@@ -13,25 +13,26 @@
       </thead>
       <tbody>
         <ng-container *ngIf="panierDetails && panierDetails.length > 0; else emptyPanier">
-          <tr *ngFor="let item of panierDetails">
+          <ng-container *ngFor="let item of panierDetails">
+            <tr>
             <td>{{ item.quantitecde }}</td>
-            <td>
+          
               <ul>
                 <ng-container *ngFor="let article of item.articles">
-                  <li>
-                    {{ article.titre }} - {{ article.prix }} DT 
-                    <button class="btn btn-sm btn-success" (click)="addToCart(article)">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" (click)="removeFromPanier(item.id, article.id)">
-                      <i class="fas fa-minus"></i>
-                    </button>
-                  </li>
+                  <td> {{ article.titre }} </td>   
+                  <td> <button class="btn btn-sm btn-success" (click)="addToCart(article)">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="removeFromPanier(item.id, article.id)">
+                    <i class="fas fa-minus"></i>
+                  </button></td>
                 </ng-container>
               </ul>
-            </td>
-            <td></td> <!-- Espace réservé pour les actions -->
+          
+          <!-- Espace réservé pour les actions -->
           </tr>
+          <tr style="margin-top: 20px;">  <td> </td>  <td>  Total : {{ item.totalP }} </td> <td>DT</td></tr>
+          </ng-container>
         </ng-container>
       </tbody>
     </table>
