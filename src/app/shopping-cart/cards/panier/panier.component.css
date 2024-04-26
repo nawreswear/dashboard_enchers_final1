@@ -1,61 +1,54 @@
-/* Styles pour la carte du panier */
+/* Card du panier */
 .card {
-    border: none; /* Supprimer la bordure par défaut */
-  }
-  
-  .card-header {
-    background-color: #343a40; /* Couleur de fond pour l'en-tête */
-    border-bottom: none; /* Supprimer la bordure inférieure */
-  }
-  
-  .card-body {
-    padding: 1.5rem; /* Espacement intérieur du corps de la carte */
-  }
-  
-  .card-footer {
-    background-color: #fff; /* Couleur de fond pour le pied de carte */
-    border-top: none; /* Supprimer la bordure supérieure */
-  }
-  
-  /* Styles pour le tableau des détails du panier */
-  .table {
-    border-radius: 0.25rem; /* Coins arrondis pour le tableau */
-  }
-  
-  .table thead th {
-    border-top: none; /* Supprimer la bordure supérieure des cellules d'en-tête */
-  }
-  
-  .table th, .table td {
-    border-color: #98999b; /* Couleur de la bordure des cellules */
-  }
-  
-  /* Styles pour les boutons */
-  .btn {
-    border-radius: 0.25rem; /* Coins arrondis pour les boutons */
-  }
-  
-  .btn-success {
-    background-color: #28a745; /* Couleur de fond pour les boutons de succès */
-    border-color: #28a745; /* Couleur de bordure pour les boutons de succès */
-  }
-  
-  .btn-success:hover {
-    background-color: #218838; /* Couleur de fond au survol des boutons de succès */
-    border-color: #1e7e34; /* Couleur de bordure au survol des boutons de succès */
-  }
-  
-  /* Styles pour le message de panier vide */
-  .text-center {
-    margin-top: 2rem; /* Espacement en haut du message */
-  }
-  
-  /* Styles pour les liens */
-  a {
-    color: #007bff; /* Couleur du lien */
-  }
-  
-  a:hover {
-    color: #0056b3; /* Couleur du lien au survol */
-  }
-  
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+
+/* Header de la carte */
+.card-header {
+  background-color: #343a40;
+}
+
+/* Titre du header */
+.card-header h5 {
+  margin-bottom: 0;
+}
+
+/* Corps de la carte */
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Tableau des articles */
+.table {
+  margin-bottom: 0;
+}
+
+/* Boutons */
+.btn {
+  background-color: rgb(2, 97, 26);
+  color: #fff;
+  border: none;
+}
+
+.btn-success {
+  background-color: rgb(2, 97, 26);
+}
+
+.btn-danger {
+  background-color: red;
+}
+
+/* Espacement entre les boutons */
+.btn-block {
+  margin-top: 10px;
+}
+
+/* Image miniature de l'article */
+.img-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  margin-right: 10px;
+}

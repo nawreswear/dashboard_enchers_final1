@@ -29,7 +29,7 @@ interface Categorie {
 export class ArticleService {
   private baseUrl = 'http://localhost:3002/article'; 
   private baseUrl2 = 'http://localhost:3004/panier';  
-
+  private baseUrl3 = 'http://localhost:3004/articles'; 
   constructor(private http: HttpClient) { }
 
   getAllCategories(): Observable<Categorie[]> {
@@ -97,6 +97,9 @@ updateArticleStatut(id: number, statut: string): Observable<any> {
     const url = `${this.baseUrl}/updateArticlePrice/${enchereId}/${articleId}`;
     return this.http.put<any>(url, { prixvente });
   }
-  
- 
+  viderPanier(id: number): Observable<any> {
+    const url = `${this.baseUrl3}/panier/${id}`;
+    return this.http.delete(url);
+}
+
 }

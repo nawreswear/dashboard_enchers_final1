@@ -24,6 +24,8 @@ export class PanierComponent implements OnInit {
   tokenObs$ = this.token.asObservable();
   collapsed: boolean = true;
   parten: any | null = null;
+
+ 
  public panierItems: any[] = [];
   constructor(public panierService: PanierService, private articleService: ArticleService,
     private encherService :  EnchersServiceService, private  partEnService : PartEnService,
@@ -370,28 +372,50 @@ removeArticle(index: number) {
   }
   removeFromPanier(panierId: number, articleId: number) {
     this.articleService.supprimerArticleDuPanier(panierId, articleId).subscribe(
-      (response) => {
-        console.log('Article supprimé du panier avec succès :', response);
-        
-        // Après avoir supprimé l'article du panier, appeler deletePanier
-        this.panierService.deletePanier(panierId).subscribe(
-          (deleteResponse) => {
-            console.log('Panier supprimé avec succès :', deleteResponse);
-            // Traitez la réponse comme vous le souhaitez
-          },
-          (deleteError) => {
-            console.error('Une erreur s\'est produite lors de la suppression du panier :', deleteError);
-            // Traitez l'erreur comme vous le souhaitez
-          }
-        );
-        
-        // Traitez la réponse comme vous le souhaitez, par exemple mettre à jour l'affichage ou afficher un message de confirmation.
+        (response) => {
+            console.log('Article supprimé du panier avec succès :', response);
+
+            // Mettre à jour l'affichage ou afficher un message de confirmation.
+            // Vous pouvez également mettre à jour les détails du panier ici pour refléter les changements
+
+            // Mettre à jour les détails du panier
+            this.panierService.getPanierAvecIdPartenaire(panierId).subscribe(
+                (paniers: Panier[]) => {
+                    if (paniers && paniers.length > 0) {
+                        const panier = paniers[0];
+                        if (panier.quantitecde === 0 && panier.totalP === 0) {
+                            // Si la quantitecde et le totalP sont tous deux égaux à zéro, vider complètement le panier
+                            this.panierItems = [];
+                        }
+                    } else {
+                        console.error("Aucun panier trouvé avec l'ID :", panierId);
+                    }
+                },
+                (error) => {
+                    console.error("Erreur lors de la récupération des détails du panier :", error);
+                }
+            );
+        },
+        (error) => {
+            console.error('Une erreur s\'est produite lors de la suppression de l\'article du panier :', error);
+            // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
+        }
+    );
+}
+  
+viderPanier(id: number): void {
+  if (id !== undefined) {
+    this.articleService.viderPanier(id).subscribe(
+      () => {
+        console.log('Le panier a été vidé avec succès');
+        // Ajoutez ici le traitement supplémentaire après la suppression du panier
       },
       (error) => {
-        console.error('Une erreur s\'est produite lors de la suppression de l\'article du panier :', error);
-        // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
+        console.error('Une erreur s\'est produite lors du vidage du panier :', error);
+        // Ajoutez ici la gestion des erreurs
       }
     );
   }
+}
 
 }
