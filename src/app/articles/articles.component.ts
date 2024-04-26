@@ -193,7 +193,7 @@ if (storedToken) {
   }
 errorMessage: string = '';
 
-addToCart(article: any) {
+/*addToCart(article: any) {
   // Retrieve the user's ID
   const storedToken = localStorage.getItem('token');
   if (storedToken) {
@@ -218,7 +218,7 @@ addToCart(article: any) {
                                       console.log(" article.quantiter", article.quantiter);
                                       
                                       // Check if the quantity in the cart does not exceed the available quantity
-                                      if (cart.quantitecde < article.quantiter) {
+                                     // if (cart.quantitecde < article.quantiter) {
                                         console.log("cart.quantitecd", cart.quantitecde);
                                           // Update the cart with the article's quantity and price
                                           cart.quantitecde++ || 0;
@@ -238,7 +238,7 @@ addToCart(article: any) {
                                                   console.error("Error updating cart:", error);
                                               }
                                           );
-                                      } else {
+                                     /* } else {
                                           console.error("Quantity in cart exceeds available quantity");
                                           // Handle the situation where the quantity in cart exceeds available quantity
                                           const errorMessage = "Quantity in cart exceeds available quantity";
@@ -271,49 +271,137 @@ addToCart(article: any) {
           );
       }
   }
+}*/
+addToCart(article: any) {
+  // Récupérer l'ID de l'utilisateur
+  const storedToken = localStorage.getItem('token');
+  if (storedToken) {
+      const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+      if (tokenPayload.sub) {
+          const username = tokenPayload.sub;
+          // Trouver l'ID de l'utilisateur par son nom d'utilisateur
+          this.encherService.findUserIdByNom(username).subscribe(
+              userId => {
+                  console.log('ID utilisateur trouvé :', userId);
+                  // Une fois que vous avez l'ID de l'utilisateur, récupérez l'ID du partenaire
+                  this.partEnService.getPartenIdByUserId(userId).subscribe(
+                      partnerId => {
+                          console.log('ID partenaire trouvé :', partnerId);
+                          // Appelez votre service pour obtenir les paniers associés au partenaire
+                          this.panierService.getPaniersByPartenaire(partnerId).subscribe(
+                              (carts: any[]) => {
+                                  // Vérifiez si les paniers existent
+                                  if (carts && carts.length > 0) {
+                                      // Sélectionnez le premier panier du tableau
+                                      const cart = carts[0];
+                                      console.log("Quantité de l'article :", article.quantite);
+                                      
+                                      // Vérifiez si la quantité dans le panier ne dépasse pas la quantité disponible
+                                      this.panierService.containsArticle(cart.id, article.id).subscribe(
+                                        (articleExists: boolean) => {
+                                          if (articleExists) {
+                                            console.log("L'article existe dans le panier.");
+
+                                            // Mettez à jour le panier avec la quantité et le prix de l'article
+                                            cart.quantitecde++;
+                                            cart.totalP += article.prixvente;
+
+                                            // Appelez votre service pour mettre à jour le panier
+                                            this.panierService.updatePanier(cart.id, cart).subscribe(
+                                                (response) => {
+                                                    console.log("Panier mis à jour avec succès :", response);
+                                                },
+                                                (error) => {
+                                                    console.error("Erreur lors de la mise à jour du panier :", error);
+                                                }
+                                            );
+                                          } else {
+                                            console.log("L'article n'existe pas dans le panier. Création d'un nouveau panier.",partnerId,cart.id,article);
+                                            cart.quantitecde++;
+                                            cart.totalP = article.prixvente * cart.quantitecde;
+                                            console.log("existingCart.id",cart.id);
+                                            // Appeler le service pour ajouter l'article au panier
+                                            this.panierService.addToCart(article.id, cart.id, partnerId).subscribe(
+                                              (response) => {
+                                                console.log("Article ajouté au panier avec succès:", response);
+                                              },
+                                              (error) => {
+                                                console.error("Erreur lors de l'ajout de l'article au panier:", error);
+                                              }
+                                            );
+              
+                                          }
+                                        },
+                                        (error) => {
+                                          console.error("Erreur lors de la vérification de l'article dans le panier :", error);
+                                        }
+                                      );
+                                  } else {
+                                      // Créez un nouveau panier pour le partenaire et ajoutez l'article
+                                      console.log("L'article n'existe pas dans le panier. Création d'un nouveau panier.",partnerId,article);
+                                      this.createCart(partnerId, article);
+                                  }
+                              },
+                              (error) => {
+                                  console.error("Erreur lors de la récupération des paniers :", error);
+                              }
+                          );
+                      },
+                      error => {
+                          console.error('Erreur lors de la récupération de l\'ID partenaire:', error);
+                      }
+                  );
+              },
+              error => {
+                  console.error('Erreur lors de la récupération de l\'ID utilisateur:', error);
+              }
+          );
+      }
+  }
 }
 
 createCart(partnerId: any, article: any) {
-  // Create a new cart for the partner
+  // Créer un nouveau panier pour le partenaire
   this.panierService.addPanier(partnerId).subscribe(
       (newCartId: number) => {
-          console.log("New cart created with ID:", newCartId);
+          console.log("Nouveau panier créé avec l'ID :", newCartId);
 
-          // Retrieve the newly created cart from the server
+          // Récupérer le nouveau panier créé depuis le serveur
           this.panierService.getPanierById(newCartId).subscribe(
               (newCart: any) => {
-                  console.log("New cart details:", newCart);
-                if (newCart.quantitecde < article.quantiter) {
+                  console.log("Détails du nouveau panier :", newCart);
+                  //  if (newCart.quantitecde < article.quantiter) {
                   newCart.quantitecde++ || 0;
-                  // Set the initial quantity to 1 and calculate the total price
+                  // Définir la quantité initiale à 1 et calculer le prix total
                   newCart.quantitecde++;
                   newCart.totalP = article.prixvente * newCart.quantitecde;
 
-                  // Add the article to the new cart
+                  // Ajouter l'article au nouveau panier
                   this.panierService.addToCart(article.id, newCartId, partnerId).subscribe(
                       (response) => {
-                          console.log("Article added to cart successfully:", response);
+                          console.log("Article ajouté au panier avec succès :", response);
                       },
                       (error) => {
-                          console.error("Error adding article to cart:", error);
+                          console.error("Erreur lors de l'ajout de l'article au panier :", error);
                       }
                       
                   );
-                } else {
-                  console.error("Quantity in cart exceeds available quantity");
-                  // Handle the situation where the quantity in cart exceeds available quantity
-              }
+               /* } else {
+                  console.error("La quantité dans le panier dépasse la quantité disponible");
+                  // Gérer la situation où la quantité dans le panier dépasse la quantité disponible
+              }*/
               },
               (error) => {
-                  console.error("Error retrieving new cart details:", error);
+                  console.error("Erreur lors de la récupération des détails du nouveau panier :", error);
               }
           );
       },
       (error) => {
-          console.error("Error creating new cart:", error);
+          console.error("Erreur lors de la création du nouveau panier :", error);
       }
   );
 }
+
 
   getAllArticles() {
     this.articleService.getAllArticles().subscribe(

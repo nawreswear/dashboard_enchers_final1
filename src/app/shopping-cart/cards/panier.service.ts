@@ -60,6 +60,9 @@ constructor(private httpClient: HttpClient) { }
 addPanier(partenId: number): Observable<number> {
   return this.httpClient.post<number>(`http://localhost:3004/panier/addPanier/${partenId}`, {});
 }
+containsArticle(panierId: number, articleId: number): Observable<boolean> {
+  return this.httpClient.get<boolean>(`http://localhost:3004/panier/containsArticle/${panierId}/${articleId}`);
+}
 supprimerArticleDuPanier(panierId: number, articleId: number): Observable<any> {
   return this.httpClient.delete<any>(`http://localhost:3004/articles/${panierId}/supprimer-article/${articleId}`);
 }
