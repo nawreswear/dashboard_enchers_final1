@@ -47,7 +47,9 @@ export class AppComponent implements OnInit {
            this.currentPath.startsWith('/categorie') || 
            this.currentPath.startsWith('/demande-vendeur') || 
            this.currentPath.startsWith('/paiment') || 
-           this.currentPath.startsWith('/parten'));
+           this.currentPath.startsWith('/parten') || 
+           this.currentPath.startsWith('/commentaires')||
+           this.currentPath.startsWith('/signalisation'));
   }
   
  

@@ -14,6 +14,7 @@ import { PanierService } from 'src/app/shopping-cart/cards/panier.service';
 import { PartEnService } from 'src/app/part-en.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Observable, map } from 'rxjs';
 interface Enchere {
   id?: number;
   dateDebut: string;
@@ -46,11 +47,11 @@ public collapsed = true;
 nombreEncheresEnCours: number = 0;
 encheres: Enchere[] = []; // Initialisez le tableau des enchères
 loading: boolean = false; // Initialisez le chargement des données
-showCart = false;
+showCart: boolean = false;
 orderFinished = false;
 @ViewChild('productsC')
 productsC!: CardsComponent;
-
+cheminImage: string = '';
 @ViewChild('shoppingCartC')
  shoppingCartC!: PanierComponent;
  images: string[] = ['assets/image1.jpg', 'assets/image2.jpg', 'assets/image3.jpg'];
@@ -61,9 +62,19 @@ productsC!: CardsComponent;
   userData: User | null = null;
   userMenu: boolean = false;
   showUserInfo = false;
+  urlPattern = new RegExp('^(https?:\\/\\/)?' + // Protocole
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // Nom de domaine
+  '((\\d{1,3}\\.){3}\\d{1,3}))' + // Ou une adresse IP (v4) 
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // Port et chemin
+  '(\\?[;&a-z\\d%_.~+=-]*)?' + // Paramètres de requête
+  '(\\#[-a-z\\d_]*)?$', 'i'); // Fragment
+  photoNom: string = '';
   userType: string | string[] | null;
   public panierItems: any[] = [];
   showCartDetails: boolean = false;
+  nomImage$: Observable<string> | undefined;
+  nom: string | null = null; // Définissez le nom de l'utilisateur ici
+  photoUrl: string = '';
   constructor(
     public authService: AuthService,
     private router: Router,public panierService: PanierService,
@@ -89,10 +100,38 @@ productsC!: CardsComponent;
     setInterval(() => {
       this.changeImage();
     }, 5000); // Change d'image toutes les 5 secondes
-    
     this.getAllEncheres();
-    
+
+    this.getUserPhoto();
     this.getPartenIdByUserId();
+    console.log("this.nom", this.nom);
+
+  }
+
+ getUserPhoto(): void {
+  console.log("this.nom : ", this.nom);
+  this.nom = this.authService.getUserPassword();
+  if (this.nom !== null) {
+    this.authService.getPhotoByName(this.nom).subscribe(
+      (photoUrl: string) => {
+        console.log("l'image récupéréeee:", this.photoUrl);
+        this.photoUrl = photoUrl;
+        console.log("l'image récupérée:", this.photoUrl);
+      },
+      (error: any) => {
+        console.error('Erreur lors de la récupération de l\'URL de l\'image:', error);
+      }
+    );
+  } else {
+    console.error('La valeur de this.nom est null. Impossible de récupérer l\'URL de l\'image.');
+  }
+}
+
+  
+  // Méthode pour vérifier si une URL est valide
+  isValidURL(url: string): boolean {
+    const urlPattern = new RegExp('^(https?:\\/\\/)?([a-z0-9-]+\\.)+[a-z]{2,}([\\/\\?#].*)?$', 'i');
+    return urlPattern.test(url);
   }
   
   getPanierDetails(partenId: number) {
@@ -207,13 +246,149 @@ finishOrder(orderFinished: any) {
   this.ArticleAdded =[]
   }
 }
+addToCart(article: any) {
+  // Récupérer l'ID de l'utilisateur
+  const storedToken = localStorage.getItem('token');
+  if (storedToken) {
+      const tokenPayload = JSON.parse(atob(storedToken.split('.')[1]));
+      if (tokenPayload.sub) {
+          const username = tokenPayload.sub;
+          // Trouver l'ID de l'utilisateur par son nom d'utilisateur
+          this.encherService.findUserIdByNom(username).subscribe(
+              userId => {
+                  console.log('ID utilisateur trouvé :', userId);
+                  // Une fois que vous avez l'ID de l'utilisateur, récupérez l'ID du partenaire
+                  this.partEnService.getPartenIdByUserId(userId).subscribe(
+                      partnerId => {
+                          console.log('ID partenaire trouvé :', partnerId);
+                          // Appelez votre service pour obtenir les paniers associés au partenaire
+                          this.panierService.getPaniersByPartenaire(partnerId).subscribe(
+                              (carts: any[]) => {
+                                  // Vérifiez si les paniers existent
+                                  if (carts && carts.length > 0) {
+                                      // Sélectionnez le premier panier du tableau
+                                      const cart = carts[0];
+                                      console.log("Quantité de l'article :", article.quantite);
+                                      
+                                      // Vérifiez si la quantité dans le panier ne dépasse pas la quantité disponible
+                                      this.panierService.containsArticle(cart.id, article.id).subscribe(
+                                        (articleExists: boolean) => {
+                                          if (articleExists) {
+                                            console.log("L'article existe dans le panier.");
 
+                                            // Mettez à jour le panier avec la quantité et le prix de l'article
+                                            cart.quantitecde++;
+                                            cart.totalP = article.prixvente + cart.totalP;
+
+                                            // Appelez votre service pour mettre à jour le panier
+                                            this.panierService.updatePanier(cart.id, cart).subscribe(
+                                                (response) => {
+                                                    console.log("Panier mis à jour avec succès :", response);
+                                                    this.getPanierDetails;
+                                            
+                                                },
+                                                (error) => {
+                                                    console.error("Erreur lors de la mise à jour du panier :", error);
+                                                }
+                                            );
+                                          } else {
+                                            console.log("L'article n'existe pas dans le panier. Création d'un nouveau panier.",partnerId,cart.id,article);
+                                            cart.quantitecde++;
+                                            cart.totalP = article.prixvente + cart.totalP;
+                                            console.log("existingCart.id",cart.id);
+                                            // Appeler le service pour ajouter l'article au panier
+                                            this.panierService.addToCart(article.id, cart.id, partnerId).subscribe(
+                                              (response) => {
+                                                console.log("Article ajouté au panier avec succès:", response);
+                                                this.getPanierDetails;
+                                     
+                                              },
+                                              (error) => {
+                                                console.error("Erreur lors de l'ajout de l'article au panier:", error);
+                                              }
+                                            );
+              
+                                          }
+                                        },
+                                        (error) => {
+                                          console.error("Erreur lors de la vérification de l'article dans le panier :", error);
+                                        }
+                                      );
+                                  } else {
+                                      // Créez un nouveau panier pour le partenaire et ajoutez l'article
+                                      console.log("L'article n'existe pas dans le panier. Création d'un nouveau panier.",partnerId,article);
+                                      this.createCart(partnerId, article);
+                                  }
+                              },
+                              (error) => {
+                                  console.error("Erreur lors de la récupération des paniers :", error);
+                              }
+                          );
+                      },
+                      error => {
+                          console.error('Erreur lors de la récupération de l\'ID partenaire:', error);
+                      }
+                  );
+              },
+              error => {
+                  console.error('Erreur lors de la récupération de l\'ID utilisateur:', error);
+              }
+          );
+      }
+  }
+}
+
+createCart(partnerId: any, article: any) {
+  // Créer un nouveau panier pour le partenaire
+  this.panierService.addPanier(partnerId).subscribe(
+      (newCartId: number) => {
+          console.log("Nouveau panier créé avec l'ID :", newCartId);
+
+          // Récupérer le nouveau panier créé depuis le serveur
+          this.panierService.getPanierById(newCartId).subscribe(
+              (newCart: any) => {
+                  console.log("Détails du nouveau panier :", newCart);
+                  //  if (newCart.quantitecde < article.quantiter) {
+                  newCart.quantitecde++ || 0;
+                  // Définir la quantité initiale à 1 et calculer le prix total
+                  newCart.quantitecde++;
+                  newCart.totalP = article.prixvente + newCart.totalP;
+
+                  // Ajouter l'article au nouveau panier
+                  this.panierService.addToCart(article.id, newCartId, partnerId).subscribe(
+                      (response) => {
+                          console.log("Article ajouté au panier avec succès :", response);
+                          this.getPanierDetails;
+                      },
+                      (error) => {
+                          console.error("Erreur lors de l'ajout de l'article au panier :", error);
+                      }
+                      
+                  );
+         
+              },
+              (error) => {
+                  console.error("Erreur lors de la récupération des détails du nouveau panier :", error);
+              }
+          );
+      },
+      (error) => {
+          console.error("Erreur lors de la création du nouveau panier :", error);
+      }
+  );
+}
 // Dans NavbarComponent
 toggleCartDetails(): void {
   this.showCart = !this.showCart;
 }
+hideCart() {
+  this.showCart = false;
+}
+openCart() {
+  this.showCart = true; // Ouvrir le panier
+}
 
-
+// Méthode pour afficher le panier
 
 reset() {
 this.orderFinished = false;
@@ -255,14 +430,13 @@ if(existe===false) this.ArticleAdded.push(product);
     this.userMenu = !this.userMenu;
   }
 
-
   logout() {
     // Clear user data
     localStorage.removeItem('token');
     localStorage.removeItem('type');
     // Refresh the page
     window.location.reload();
-    // Optional: Navigate to the login page
-    // this.router.navigate(['/login']);
   }
+  
+
 }

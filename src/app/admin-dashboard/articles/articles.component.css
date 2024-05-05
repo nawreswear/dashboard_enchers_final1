@@ -190,10 +190,11 @@
   cursor: pointer;
 }
 .grid-container {
+ margin-left: 20px;
   display: flex; /* Assuming it's already using flexbox */
   flex-direction: column; /* Stack elements vertically */
   justify-content: space-between; /* Reduce space between elements */
-  width: 220%;
+  width: 190%;
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));

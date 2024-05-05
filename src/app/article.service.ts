@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { Panier } from './shopping-cart/cards/panier.service';
 import { NumberFormatStyle } from '@angular/common';
 interface Article {
@@ -30,8 +30,17 @@ export class ArticleService {
   private baseUrl = 'http://localhost:3002/article'; 
   private baseUrl2 = 'http://localhost:3004/panier';  
   private baseUrl3 = 'http://localhost:3004/articles'; 
-  constructor(private http: HttpClient) { }
+  private selectedArticleSubject: BehaviorSubject<Article | null> = new BehaviorSubject<Article | null>(null);
+  public selectedArticle$: Observable<Article | null> = this.selectedArticleSubject.asObservable();
 
+  constructor(private http: HttpClient) { }
+  public setSelectedArticle(article: Article): void {
+    this.selectedArticleSubject.next(article);
+  }
+
+  public getSelectedArticle(): Observable<Article | null> {
+    return this.selectedArticle$;
+  }
   getAllCategories(): Observable<Categorie[]> {
     return this.http.get<Categorie[]>(`http://localhost:3002/categorie/getallcategories`);
   }

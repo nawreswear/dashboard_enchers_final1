@@ -13,28 +13,26 @@
     <table class="table"  style="margin-top: 15px;">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Montant</th>
+          <th>Numéro </th>
+          <th>Montant (Dt)</th>
           <th>Statut</th>
-          <th>Date</th>
-          <th>Panier</th>
+          <th> <i class="far fa-calendar-alt"></i> Date</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let paiement of paiements">
+        <tr *ngFor="let paiement of paiements$ | async">
           <td>{{ paiement.id }}</td>
-          <td>{{ paiement.montant }}</td>
-          <td>{{ paiement.statut }}</td>
-          <td>{{ paiement.date | date: 'short' }}</td>
+          <td>{{ paiement.montant }} </td>
           <td>
-        <div *ngIf="paiement.panier">
-              <p><strong>ID:</strong> {{ paiement.panier.id }}</p>
-              <p><strong>Total:</strong> {{ paiement.panier.totalP }}</p>
-              <p><strong>Date:</strong> {{ paiement.panier.date | date: 'short' }}</p>
-              <p><strong>Utilisateur:</strong> {{ paiement.panier.user.nom }} {{ paiement.panier.user.prenom }}</p>
-              <p><strong>Ligne de panier:</strong></p>
-            </div>
+            <ng-container *ngIf="paiement.statut === 'En attente'">
+              <i class="fas fa-clock" style="background-color: rgb(245, 245, 14); color: rgb(118, 121, 121); font-size: 15px; font-style: normal;"></i>
+         
+            </ng-container>
+            <ng-container *ngIf="paiement.statut === 'acceptée'">
+              <i class="fas fa-check" style=" color: rgb(7, 145, 7); font-size: 15px; font-style: normal;"></i>  
+            </ng-container>
           </td>
+                 <td>{{ paiement.date | date: 'short' }}</td>
         </tr>
       </tbody>
     </table>

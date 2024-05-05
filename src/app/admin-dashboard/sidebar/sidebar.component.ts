@@ -50,7 +50,7 @@ export class SidebarComponent {
           icon: 'fa-solid fa-handshake',
         },
         {
-          name: 'commentaire',
+          name: 'commentaires',
           icon: 'fa-solid fa-comment',
         },
        /*{
@@ -91,9 +91,10 @@ export class SidebarComponent {
         }
         ,*/
         {
-          name: 'livraison',
-          icon: 'fa-solid fa-truck' 
+          name: 'signalisation',
+          icon: 'fas fa-exclamation-triangle' 
         }
+
         /*,
         {
           name: 'livraison',

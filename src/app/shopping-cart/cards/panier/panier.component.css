@@ -1,54 +1,109 @@
-/* Card du panier */
-.card {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
+/* Overall container for the shopping cart */
+.shopping-cart-container {
+  max-width: 700px; /* Adjust as needed */
+  margin: 0 auto; /* Center the cart horizontally */
+  font-family: Arial, sans-serif; /* Clean and professional font */
+  box-sizing: border-box; /* Ensures consistent padding/border behavior */
 }
 
-/* Header de la carte */
+/* Shopping cart card (main container) */
+.shopping-cart-card {
+  margin-top: 50px; /* Adjust as needed */
+  border-radius: 5px; /* Rounded corners for a softer look */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  background-color: #fff; /* Light background for better readability */
+  border: 1px solid #ddd; /* Thin border for definition */
+}
+
+/* Card header (title) */
 .card-header {
-  background-color: #343a40;
+  background-color: #343a40; /* Darker header color */
+  color: #fff; /* White text */
+  border-bottom: none; /* Remove bottom border for cleaner look */
+  padding: 15px 20px;
+  font-size: 1.2rem; /* Slightly larger font for title */
 }
 
-/* Titre du header */
-.card-header h5 {
-  margin-bottom: 0;
-}
-
-/* Corps de la carte */
 .card-body {
-  padding: 1.25rem;
+  padding: 20px;
 }
 
-/* Tableau des articles */
+/* Table styles */
 .table {
-  margin-bottom: 0;
+  border-collapse: collapse; /* Remove default table borders */
+  width: 100%; /* Make the table span the full width */
 }
 
-/* Boutons */
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd; /* Add a thin border for separation */
+}
+
+th {
+  background-color: #f0f0f0; /* Light gray background for table header */
+  font-weight: bold; /* Bold text for emphasis */
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9; /* Alternate background color for odd rows */
+}
+
+.table-hover tr:hover {
+  background-color: #e8e8e8; /* Highlight on hover */
+}
+
+/* Image styles for product photos */
+.shopping-cart-card .card-body img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; /* Maintain aspect ratio and cover the area */
+  border-radius: 5px;
+  margin-right: 1rem;
+}
+
+/* Article title and quantity section */
+.shopping-cart-card .card-body .d-flex.align-items-center {
+  align-items: stretch; /* Stretch the article title to fill the height */
+}
+
+/* Styling for buttons (add to cart, remove from cart) */
 .btn {
-  background-color: rgb(2, 97, 26);
-  color: #fff;
-  border: none;
+  border-radius: 5px; /* Rounded corners for buttons */
+  font-size: 0.8rem; /* Adjust font size as needed */
+  padding: 8px 12px; /* Adjust padding as needed */
+  transition: all 0.2s ease-in-out; /* Smooth hover effect */
+  border: 1px solid transparent; /* Transparent border by default */
+}
+
+.btn:hover {
+  background-color: #ddd; /* Subtle background change on hover */
+  border-color: #ddd; /* Change border color on hover */
 }
 
 .btn-success {
-  background-color: rgb(2, 97, 26);
+  background-color: #28a745; /* Green color for success button */
+  border-color: #28a745;
+  color: #fff; /* White text for better contrast */
+}
+
+.btn-outline-success {
+  border-color: #28a745;
+  color: #28a745; 
+ /* Green color for outline button */
 }
 
 .btn-danger {
-  background-color: red;
+  background-color: #dc3545; /* Red color for danger button */
+  border-color: #dc3545;
+  color: #fff; /* White text for better contrast */
 }
 
-/* Espacement entre les boutons */
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545; /* Red color for outline button */
+}
+
 .btn-block {
-  margin-top: 10px;
+  width: 1
 }
 
-/* Image miniature de l'article */
-.img-thumbnail {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 0.25rem;
-  margin-right: 10px;
-}

@@ -58,13 +58,13 @@ export class PanierService {
 constructor(private httpClient: HttpClient) { }
 
 addPanier(partenId: number): Observable<number> {
-  return this.httpClient.post<number>(`http://localhost:3004/panier/addPanier/${partenId}`, {});
+  return this.httpClient.post<number>(`http://localhost:3004/panier/addPanier/${partenId}`, {}, this.httpOptions);
 }
 containsArticle(panierId: number, articleId: number): Observable<boolean> {
-  return this.httpClient.get<boolean>(`http://localhost:3004/panier/containsArticle/${panierId}/${articleId}`);
+  return this.httpClient.get<boolean>(`http://localhost:3004/panier/containsArticle/${panierId}/${articleId}`, this.httpOptions);
 }
 supprimerArticleDuPanier(panierId: number, articleId: number): Observable<any> {
-  return this.httpClient.delete<any>(`http://localhost:3004/articles/${panierId}/supprimer-article/${articleId}`);
+  return this.httpClient.delete<any>(`http://localhost:3004/articles/${panierId}/supprimer-article/${articleId}`, this.httpOptions);
 }
 getPaniersByPartenaire(partenId: number): Observable<Panier[]> {
   return this.httpClient.get<Panier[]>(`http://localhost:3004/panier/${partenId}`);
@@ -72,7 +72,7 @@ getPaniersByPartenaire(partenId: number): Observable<Panier[]> {
 
 addToCart(articleId: number, panierId: number, partenId: number): Observable<Panier> {
 
-  return this.httpClient.post<Panier>(`http://localhost:3004/articles/${articleId}/${panierId}/${partenId}/ajouter-article`, {});
+  return this.httpClient.post<Panier>(`http://localhost:3004/articles/${articleId}/${panierId}/${partenId}/ajouter-article`, {}, this.httpOptions);
 }
 getPanierAvecIdPartenaire(partenId: number): Observable<Panier[]> {
   return this.httpClient.get<any[]>(`http://localhost:3004/panier/partenaire/${partenId}`);
@@ -91,11 +91,11 @@ updatePanier(id: number, panier: Panier): Observable<Panier> {
 }
 
 deletePanier(id: number): Observable<string> {
-  return this.httpClient.delete<string>(`${this.apiURL}/deletePanier/${id}`);
+  return this.httpClient.delete<string>(`${this.apiURL}/deletePanier/${id}`, this.httpOptions);
 }
 
-calculerMontantTotal(): Observable<number> {
+/* calculerMontantTotal(): Observable<number> {
   return this.httpClient.get<number>(`${this.apiURL}/calculerMontantTotal`);
-}
+}*/
 
 }

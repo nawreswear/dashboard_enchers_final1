@@ -12,9 +12,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-
+  photoUrl: string = '';
   private type: string[];
   isLoggedIn = false;
+  nom: string | null = null; 
+  photoNom: string = '';
   showAdminBoard = false;
   showVendeurBoard = false;
   username: string;
@@ -54,7 +56,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenStorageService.getToken();
-
+    this.getUserPhoto();
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
       if (user) {
@@ -100,5 +102,22 @@ export class HeaderComponent implements OnInit {
       // Optional: Navigate to the login page
       // this.router.navigate(['/login']);
     }
-
+    getUserPhoto(): void {
+      console.log("this.nom : ", this.nom);
+      this.nom = this.authService.getUserPassword();
+      if (this.nom !== null) {
+        this.authService.getPhotoByName(this.nom).subscribe(
+          (photoUrl: string) => {
+            console.log("l'image récupéréeee:", this.photoUrl);
+            this.photoUrl = photoUrl;
+            console.log("l'image récupérée:", this.photoUrl);
+          },
+          (error: any) => {
+            console.error('Erreur lors de la récupération de l\'URL de l\'image:', error);
+          }
+        );
+      } else {
+        console.error('La valeur de this.nom est null. Impossible de récupérer l\'URL de l\'image.');
+      }
+    }
 }

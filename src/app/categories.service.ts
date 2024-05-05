@@ -52,7 +52,5 @@ export class CategoriesService {
   deleteAllCategories(): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/deleteAllCategories`); 
   }
- /* getArticlesForCategory(categoryId: number): Observable<Article[]> {
-    return this.http.get<Article[]>(`${this.baseUrl}/categories/${categoryId}/articles`);
-  }*/
+
 }

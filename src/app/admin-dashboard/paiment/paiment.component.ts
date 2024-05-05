@@ -1,44 +1,59 @@
 import { Component, OnInit } from '@angular/core';
 import { PaiementService } from '../paiment.service';
 import { User } from 'src/app/interfaces/user';
-interface Paiement {
+import { Observable } from 'rxjs';
+
+export interface Panier {
+  id: number;
+  totalP: number;
+  quantitecde: number;
+  //paiements: Paiement[];
+  //partEn: { id: number };
+  //articles: Article[];
+}
+
+export interface PartEn {
+  id: number;
+  panier: Panier;
+  users: User[];
+}
+
+export interface Article {
+  id: number;
+  titre: string;
+  photo: string;
+  description: string;
+  quantiter: number;
+  prix: number;
+  livrable: boolean;
+  statut: string;
+  prixvente: number;
+  vendeur: { id: number };
+  categorie: Categorie;
+}
+
+export interface Categorie {
+  id: number;
+  titre: string;
+  description: string;
+  image: string;
+}
+
+export interface Paiement {
   id: number;
   montant: number;
   statut: string;
   date: Date;
-  panier: Panier;
+  panier: { id: number , totalP: number};
 }
-interface Panier {
-  id: number;
-  totalP: number;
-  date: Date;
-  user: User;
-  lignepanier: LignePanier;
-}
-export interface LignePanier {
-  id: number;
-  quantiteCommandee: number;
-  article: Article;
-}
-interface Article {
-  id: number; 
-  titre: string;
-  description: string;
-  photo: string;
-  prix:string;
-  prixvente:string;
-  livrable:boolean;
-  statut:string;
-  quantiter:number;
-  //categorie: Categorie;
-}
+
 @Component({
   selector: 'app-paiment',
   templateUrl: './paiment.component.html',
   styleUrls: ['./paiment.component.css']
 })
 export class PaimentComponent implements OnInit {
-  paiements: Paiement[] = [];
+  paiements$: Observable<Paiement[]> | undefined;
 
   constructor(private paimentService: PaiementService) { }
 
@@ -47,13 +62,6 @@ export class PaimentComponent implements OnInit {
   }
 
   getAllPaiements(): void {
-    this.paimentService.getAllPaiements().subscribe(
-      (paiements: Paiement[]) => {
-        this.paiements = paiements;
-      },
-      (error) => {
-        console.error('Erreur lors de la récupération des paiements :', error);
-      }
-    );
+    this.paiements$ = this.paimentService.getAllPaiements();
   }
 }

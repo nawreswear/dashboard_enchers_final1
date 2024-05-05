@@ -1,14 +1,17 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { Panier, PanierService, PartEn } from '../panier.service';
+import { Article, Paiement, Panier, PanierService, PartEn } from '../panier.service';
 import { ArticleService } from 'src/app/article.service';
 import { BehaviorSubject, Observable, map, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from 'src/app/_service/user';
 import { EnchersServiceService } from 'src/app/enchers-service.service';
 import { PartEnService } from 'src/app/part-en.service';
-
+import { PaiementService } from '../paiement.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
+import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-panier',
   templateUrl: './panier.component.html',
@@ -16,6 +19,8 @@ import { PartEnService } from 'src/app/part-en.service';
 })
 export class PanierComponent implements OnInit {
   @Input() panier: Panier = {} as Panier;
+  @ViewChild('htmlData') htmlData!: ElementRef;
+@Output() onOrderFinished = new EventEmitter();
   idRequis: number;
   userId: number | null = null;
   panierDetails: any[] = [];
@@ -27,9 +32,9 @@ export class PanierComponent implements OnInit {
 
  
  public panierItems: any[] = [];
-  constructor(public panierService: PanierService, private articleService: ArticleService,
-    private encherService :  EnchersServiceService, private  partEnService : PartEnService,
-    private router: Router) { 
+  constructor(public panierService: PanierService, private articleService: ArticleService,private paiementService: PaiementService,
+    private encherService :  EnchersServiceService, private  partEnService : PartEnService,    private snackBar: MatSnackBar,
+    private router: Router,private toastrService: ToastrService,private toastr: ToastrService) { 
     this.idRequis = 0; 
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -47,9 +52,17 @@ export class PanierComponent implements OnInit {
     });
   }
 
+  ngOnInit() {
+    this.getPartenIdByUserId();
+    this.getPanierDetails;
+   // this.invokeStripe();
+ }
+ 
   ajouterArticle(article: any) {
     this.panierItems.push(article);
-  }
+    // Ajouter le prix de vente de l'article à la somme totale du panier
+    this.total += article.prixvente;
+}
 
 // Remove an article from the cart
 removeArticle(index: number) {
@@ -95,9 +108,6 @@ removeArticle(index: number) {
                         // Update the cart with the article's quantity and price
                         cart.quantitecde--;
 
-                        // Initialize cart.totalP if it's null
-                        // cart.totalP = cart.totalP || 0;
-
                         // Update the total price of the cart
                         cart.totalP -= this.panierItems[index].prixvente;
 
@@ -105,6 +115,10 @@ removeArticle(index: number) {
                         this.panierService.updatePanier(cart.id, cart).subscribe(
                           (response) => {
                             console.log("Cart updated successfully:", response);
+                            this.snackBar.open('Article supprimer dans le panier avec succès :', 'Fermer', {
+                              duration: 3000
+                            });
+                            this.getPanierDetails;
                           },
                           (error) => {
                             console.error("Error updating cart:", error);
@@ -171,12 +185,14 @@ removeArticle(index: number) {
   
                                               // Mettez à jour le panier avec la quantité et le prix de l'article
                                               cart.quantitecde++;
-                                              cart.totalP += article.prixvente;
+                                              cart.totalP = article.prixvente + cart.totalP;
   
                                               // Appelez votre service pour mettre à jour le panier
                                               this.panierService.updatePanier(cart.id, cart).subscribe(
                                                   (response) => {
                                                       console.log("Panier mis à jour avec succès :", response);
+                                                   
+                                                      this.getPanierDetails;
                                                   },
                                                   (error) => {
                                                       console.error("Erreur lors de la mise à jour du panier :", error);
@@ -185,12 +201,16 @@ removeArticle(index: number) {
                                             } else {
                                               console.log("L'article n'existe pas dans le panier. Création d'un nouveau panier.",partnerId,cart.id,article);
                                               cart.quantitecde++;
-                                              cart.totalP = article.prixvente * cart.quantitecde;
+                                              cart.totalP = article.prixvente + cart.totalP;
                                               console.log("existingCart.id",cart.id);
                                               // Appeler le service pour ajouter l'article au panier
                                               this.panierService.addToCart(article.id, cart.id, partnerId).subscribe(
                                                 (response) => {
                                                   console.log("Article ajouté au panier avec succès:", response);
+                                                  this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                                                    duration: 3000
+                                                  });
+                                                  this.getPanierDetails;
                                                 },
                                                 (error) => {
                                                   console.error("Erreur lors de l'ajout de l'article au panier:", error);
@@ -239,24 +259,22 @@ removeArticle(index: number) {
                     console.log("Détails du nouveau panier :", newCart);
                     //  if (newCart.quantitecde < article.quantiter) {
                     newCart.quantitecde++ || 0;
-                    // Définir la quantité initiale à 1 et calculer le prix total
-                    newCart.quantitecde++;
-                    newCart.totalP = article.prixvente * newCart.quantitecde;
-  
+                    newCart.totalP = article.prixvente + newCart.totalP;
                     // Ajouter l'article au nouveau panier
                     this.panierService.addToCart(article.id, newCartId, partnerId).subscribe(
                         (response) => {
                             console.log("Article ajouté au panier avec succès :", response);
+                            this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                              duration: 3000
+                            });
+                            this.getPanierDetails;
                         },
                         (error) => {
                             console.error("Erreur lors de l'ajout de l'article au panier :", error);
                         }
                         
                     );
-                 /* } else {
-                    console.error("La quantité dans le panier dépasse la quantité disponible");
-                    // Gérer la situation où la quantité dans le panier dépasse la quantité disponible
-                }*/
+          
                 },
                 (error) => {
                     console.error("Erreur lors de la récupération des détails du nouveau panier :", error);
@@ -268,23 +286,131 @@ removeArticle(index: number) {
         }
     );
   }
-  
 
-
-  // Calculer le total du panier
-  public calculerTotal(): number {
-    let total = 0;
-    for (const item of this.panierItems) {
-      total += item.prix;
+  checkoutProduct(){
+   // this.makePayment();
+   this.passerAuPaiement();
     }
-    return total;
-  }
-  @Input() ArticleAdded: any;
+    total=0;
+   /* 
+    makePayment() {
+    let amount = this.total
+    const paymentHandler = (<any>window).StripeCheckout.configure({
+    key: this.stripeAPIKey,
+    locale: 'auto',
+    token: (stripeToken : any) => {
+    this.processPayment(amount, stripeToken);
+    },
+    });
+    paymentHandler.open({
+    name: 'ItSolutionStuff.com',
+    description: '3 widgets',
+    amount: amount * 100,
+    });
+    }
+    
+    paymentHandler: any = null;
+    stripeAPIKey: any ='pk_test_51N3okJAtYSZefbGPPzDxn721BdagE4SahC951XgF9EMVF4mcDEibV9FedHowP0S7zxhWKpKs40Yz6qcF59fPxrNJ00XYcmk1cy';
+    invokeStripe() {
+      if (!window.document.getElementById('stripe-script')) {
+        const script = window.document.createElement('script');
+        script.id = 'stripe-script';
+        script.type = 'text/javascript';
+        script.src = 'https://checkout.stripe.com/checkout.js';
+        script.onload = () => {
+          this.paymentHandler = (<any>window).StripeCheckout.configure({
+            key: this.stripeAPIKey,
+            locale: 'auto',
+            token: function (stripeToken: any) {
+              console.log(stripeToken);
+              alert('Payment has been successfull!');
+            },
+          });
+        };
+        window.document.body.appendChild(script);
+      }
+    }
+    processPayment(amount: any, stripeToken: any) {
+      console.log(stripeToken);
+      const data = {
+        montant: amount * 100, // Assurez-vous que la clé correspond à la propriété "montant" de votre modèle
+        token: stripeToken,// Ajoutez d'autres données si nécessaire
+      };
+      console.log("this.panier", this.panierDetails[0])
+      this.passerAuPaiement();
+      this.onOrderFinished.emit(false);
+      this.total = 0;
+    }   */
+    showSuccessNotification() {
+      this.toastr.success('Paiement effectué avec succès', 'Paiement', {
+        toastClass: 'payment-notification',
+        progressBar: true,
+        positionClass: 'toast-top-center'
+      });
+    }
+    passerAuPaiement() {
+      console.log("this.panier :", this.panierDetails);
+      this.panier = this.panierDetails[0];
+      // Appeler la méthode passerAuPaiement du service PaiementService
+      this.paiementService.passerAuPaiement(this.panier).subscribe(
+        (paiement: Paiement) => {
+            console.log("Paiement effectué avec succès :", paiement);
+            console.log("Panier :", this.panierDetails[0]);
+            this.showSuccessNotification();
+            // Mettre à jour le statut du paiement
+            this.paiementService.updatePaiementstatut(paiement.id).subscribe(
+              (updatedPaiement: Paiement) => {
+                console.log("Statut du paiement mis à jour avec succès ", updatedPaiement);
+                // Supprimer tous les articles de tous les paniers
+                for (const panier of this.panierDetails) {
+                  for (const article of panier.articles) {
+                      this.articleService.supprimerArticleDuPanier(panier.id, article.id).subscribe(
+                          (response) => {
+                              console.log('Article supprimé du panier avec succès :', response);
+                          
+                              // Rechercher l'article dans panierItems pour obtenir son prix de vente
+                              const articlee = this.panierItems.find(item => item.id === article.id);
+                              if (articlee) {
+                                  // Soustraire le prix de vente de l'article de la somme totale du panier
+                                  this.total -= articlee.prixvente;
+                              }
+                          },
+                          (error) => {
+                              console.error('Une erreur s\'est produite lors de la suppression de l\'article du panier :', error);
+                              // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
+                          }
+                      );
+                  }
+                  // Réinitialiser la liste des articles du panier à une liste vide
+                  panier.articles = [];
+                  // Réinitialiser les valeurs totalP et quantitecde du panier à zéro
+                  panier.totalP = 0;
+                  panier.quantitecde = 0;
+                }
+                // Mettre à jour le panier dans le service
+                this.paiementService.viderPanierApresPaiement(paiement.id).subscribe(
+                    () => {
+                        console.log("Panier vidé avec succès après le paiement :", this.panierDetails[0]);
+                        // Réinitialiser le total à zéro car tous les articles ont été supprimés
+                        this.total = 0;
+                        // Traitez la réponse comme vous le souhaitez, par exemple, afficher un message de confirmation
+                    },
+                    (error) => {
+                        console.error("Erreur lors de la suppression du panier après le paiement :", error);
+                        // Traitez l'erreur comme vous le souhaitez, par exemple, afficher un message d'erreur à l'utilisateur
+                    }
+                );
+            },
+            (error) => {
+              alert("Erreur : Opération non effectuée");
+                console.error("Erreur lors du paiement :", error);
+                // Traitez l'erreur comme vous le souhaitez, par exemple, afficher un message d'erreur à l'utilisateur
+            }
+          );
+      });
+    }
+   @Input() ArticleAdded: any;
 
-  ngOnInit() {
-    this.getPartenIdByUserId();
- }
- 
  getPanierDetails(partenId: number): void {
      this.panierService.getPanierAvecIdPartenaire(partenId).subscribe(
        (paniers: Panier[]) => {
@@ -300,7 +426,23 @@ removeArticle(index: number) {
        }
      );
  }
- 
+ getArticlesUniques(): any[] {
+  const articlesUniques: any[] = [];
+
+  if (this.panierDetails && this.panierDetails.length > 0) {
+    this.panierDetails.forEach((panier: Panier) => {
+      panier.articles.forEach((article: any) => {
+        // Vérifiez si l'article n'est pas déjà dans la liste des articles uniques
+        if (!articlesUniques.some((a: any) => a.id === article.id)) {
+          articlesUniques.push(article);
+        }
+      });
+    });
+  }
+
+  return articlesUniques;
+}
+
  showCartModal: boolean = false;
  
  getPartenIdByUserId() {
@@ -345,8 +487,26 @@ removeArticle(index: number) {
     }
     return of(null);
   }
+  genererPDF() {
+    const elementAConvertir = document.getElementById('article'); // Remplacez 'panierDetails' par l'ID de votre élément de panier
+  
+    if (!elementAConvertir) {
+      console.error("L'élément à convertir en PDF est null");
+      return;
+    }
+  
+    html2canvas(elementAConvertir).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210; // Largeur de la page A4 en mm
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+  
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('panier.pdf');
+    });
+  }
 
-  openPDF() {
+  /*openPDF() {
     let Data: any = document.getElementById('htmlData');
     html2canvas(Data).then((canvas) => {
       let fileWidth = 100;
@@ -357,28 +517,16 @@ removeArticle(index: number) {
       PDF.addImage(FILEURI, 'PNG', 50, position, fileWidth, fileHeight);
       PDF.save('cart.pdf');
     });
-  }
- addToPanier(panierId: number, articleId: number) {
-    this.articleService.ajouterArticleAuPanier(panierId, articleId).subscribe(
-      (response) => {
-        console.log('Article ajouté au panier avec succès :', response);
-        // Traitez la réponse comme vous le souhaitez, par exemple mettre à jour l'affichage ou afficher un message de confirmation.
-      },
-      (error) => {
-        console.error('Une erreur s\'est produite lors de l\'ajout de l\'article au panier :', error);
-        // Traitez l'erreur comme vous le souhaitez, par exemple afficher un message d'erreur à l'utilisateur.
-      }
-    );
-  }
+  }*/
+
   removeFromPanier(panierId: number, articleId: number) {
     this.articleService.supprimerArticleDuPanier(panierId, articleId).subscribe(
         (response) => {
             console.log('Article supprimé du panier avec succès :', response);
-
-            // Mettre à jour l'affichage ou afficher un message de confirmation.
-            // Vous pouvez également mettre à jour les détails du panier ici pour refléter les changements
-
-            // Mettre à jour les détails du panier
+            this.snackBar.open('Article supprimé du panier avec succès :', 'Fermer', {
+              duration: 3000
+            });
+            this.getPanierDetails;
             this.panierService.getPanierAvecIdPartenaire(panierId).subscribe(
                 (paniers: Panier[]) => {
                     if (paniers && paniers.length > 0) {
@@ -408,7 +556,11 @@ viderPanier(id: number): void {
     this.articleService.viderPanier(id).subscribe(
       () => {
         console.log('Le panier a été vidé avec succès');
+        this.snackBar.open('Le panier a été vidé avec succès :', 'Fermer', {
+          duration: 3000
+        });
         // Ajoutez ici le traitement supplémentaire après la suppression du panier
+        this.getPanierDetails;
       },
       (error) => {
         console.error('Une erreur s\'est produite lors du vidage du panier :', error);

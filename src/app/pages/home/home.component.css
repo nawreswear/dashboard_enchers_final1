@@ -29,13 +29,6 @@
     flex-direction: column; /* Afficher les articles dans une colonne sur les écrans plus petits */
   }
 
-  .cardd {
-    width: 100%; /* Ajustez la largeur de la carte pour qu'elle occupe toute la largeur de l'écran */
-    margin-left: 0; /* Supprimez la marge de gauche */
-    margin-top: 20px; /* Espacement entre les cartes */
-    margin-bottom: 20px; /* Espacement entre les cartes */
-  }
-
   .article-details-container {
     width: 90%; /* Ajustez la largeur du conteneur des détails de l'article */
     margin-left: auto; /* Centrez horizontalement sur les écrans plus petits */
@@ -171,8 +164,14 @@
       margin-bottom: 1rem;  /* Adjust spacing for vertical layout */
   }
 }
-/* Media queries (unchanged) */
-
+@media (max-width:  768px) {
+  .cardd { width: 100%; /* Largeur de la carte à 100% sur les écrans plus petits */
+    height: 50%;
+  margin-left: 0; /* Supprimez la marge à gauche sur les écrans plus petits */
+  margin-right: 0; /* Supprimez la marge à droite sur les écrans plus petits */
+  margin-bottom: 20px; /* Espacement entre les cartes en bas sur les écrans plus petits */
+  }
+}
 .row {
   display: grid; /* Base layout for all screen sizes */
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));  /* Adjust card width */
@@ -256,6 +255,8 @@
   border-radius: 5px; /* Coins arrondis de la carte */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre de la carte */
 }
+  /* Réglages spécifiques pour les écrans plus petits */
+
 .primary {
   background-color: #007bff;
   color: #fff;

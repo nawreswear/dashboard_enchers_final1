@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../_service/user';
 interface Paiement {
@@ -14,13 +14,8 @@ interface Panier {
   totalP: number;
   date: Date;
   user: User;
-  lignepanier: LignePanier;
 }
-export interface LignePanier {
-  id: number;
-  quantiteCommandee: number;
-  article: Article;
-}
+
 interface Article {
   id: number; 
   titre: string;
@@ -47,12 +42,13 @@ export class PaiementService {
 
   constructor(private http: HttpClient) { }
 
+  httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
+
   addPaiement(paiement: Paiement): Observable<Paiement> {
     return this.http.post<Paiement>(`${this.baseUrl}/addPaiement`, paiement);
   }
-
   getAllPaiements(): Observable<Paiement[]> {
-    return this.http.get<Paiement[]>(`${this.baseUrl}/getAllPaiements`);
+    return this.http.get<Paiement[]>('http://localhost:3004/paiements/getAllPaiements');
   }
 
   getPaiementById(id: number): Observable<Paiement> {

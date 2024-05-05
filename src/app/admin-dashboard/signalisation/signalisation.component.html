@@ -1,0 +1,25 @@
+<app-header></app-header>
+<app-sidebar></app-sidebar>
+<div class="content">
+  <h2 class="header">Liste des signalements</h2>
+  <table class="container">
+    <tr>
+      <th>ID</th>
+      <th>Message</th>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Numèro utilisateur</th>
+      <th>Nom & Prénom </th>
+    </tr>
+    <tr *ngFor="let signalement of signalements">
+      <td>{{ signalement.id }}</td>
+      <td>{{ signalement.message }}</td>
+      <td>{{ signalement.date | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+      <td>{{ signalement.type }}</td>
+      <td>{{ signalement.user.id }}</td>
+      <td>
+        {{ signalement.user.nom }}   {{ signalement.user.prenom }}
+      </td>
+    </tr>
+  </table>
+</div>

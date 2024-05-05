@@ -6,19 +6,8 @@
     <h3 class="category-title">{{ categories[currentImageIndex]?.titre }}</h3>
     <button (click)="nextImage()" class="nav-arrow">&#8250;</button>
 </div>
-
-  <!-- Carousel <app-carousel class="absolute inset-0"></app-carousel>-->
 </div>
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
- <!--<section *ngIf="relatedArticles.length > 0" class="px-4 bg-gray-100">
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <span class="p-6 rounded-lg" *ngFor="let article of relatedArticles">
-        <img class="w-full h-48 object-cover object-center mb-4 rounded-full" [src]="article.photo" alt="Article">
-        <p class="article-title" style="text-align: center;">{{ article.titre }}</p>
-      </span>
-    </div>
-  </section>--> 
-  <!-- category -->
   <section aria-labelledby="category-heading" class="pt-24 sm:pt-32 xl:mx-auto xl:max-w-7xl xl:px-8" style="margin-bottom: 1%;">
     <div class="px-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8 xl:px-0">
       <h2 id="category-heading" class="text-2xl font-bold tracking-tight text-gray-900" style="margin-top: 1%;">Shop by Category</h2>

@@ -131,6 +131,7 @@ a {
  
 }
 .header {
+font-weight: normal;
   position: absolute; /* Position absolue pour centrer le titre */
   top: 80px; /* Position verticale au milieu de la page */
   left: 50%; /* Position horizontale au milieu de la page */
@@ -140,14 +141,9 @@ a {
   font-size: 24px; /* Taille du texte */
   color: #000000; /* Couleur du texte */
   text-align: center; /* Centrage du texte */
-}
-.header {
   margin-top: 40px;
-  text-align: center ;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 24px; /* Ajustez la taille de la police selon vos préférences */
-  margin-bottom: 20px;
 }
+
 .table-striped tbody tr:nth-child(odd) {
   background-color: #f8f8f8;
 }

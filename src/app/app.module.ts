@@ -1,5 +1,5 @@
 // Imports Angular
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Route, RouterModule } from '@angular/router';
@@ -11,7 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { ToastrModule } from 'ngx-toastr';
 import { JwtModule } from '@auth0/angular-jwt';
 import { BreadcrumbModule } from 'xng-breadcrumb';
-
+import { MatIconModule } from '@angular/material/icon';
 // Components
 import { AppComponent } from './app.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
@@ -53,8 +53,16 @@ import { PanierComponent } from './shopping-cart/cards/panier/panier.component';
 import { CardsComponent } from './shopping-cart/cards/cards.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PartEnComponent } from './admin-dashboard/part-en/part-en.component';
-import { PanierService } from './shopping-cart/cards/panier.service';
-
+import { DetailArtComponent } from './detail-art/detail-art.component';
+import { CommentaireComponent } from './commentaire/commentaire.component';
+import { ModificationCommentaireDialog } from './modification-commentaire/modification-commentaire.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { CommentairesComponent } from './admin-dashboard/commentaires/commentaires.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatListModule } from '@angular/material/list';
+import { SignalementComponent } from './signalement/signalement.component';
+import { SignalisationComponent } from './admin-dashboard/signalisation/signalisation.component';
 
 const routes: Route[] = [
   {
@@ -72,6 +80,8 @@ const routes: Route[] = [
       { path: 'about', component: AboutComponent },
       { path: 'demandevendeur', component: DemandevendeurComponent },
       { path: 'articles/vendeur/articlesvendeur', component: ArticlesVendeurComponent },
+      { path: 'commentaire', component: CommentaireComponent },
+      { path: 'detail-article/:id', component: DetailArtComponent },
     ],
   },
   {
@@ -88,6 +98,8 @@ const routes: Route[] = [
       { path: 'enchere', component: EnchersuserComponent },
       { path: 'about', component: AboutComponent },
       { path: 'articlesvendeur', component: ArticlesVendeurComponent },
+      { path: 'commentaire', component: CommentaireComponent },
+      { path: 'detail-article/:id', component: DetailArtComponent },
     ],
   },
       {path: 'admin',component: AdminDashboardComponent,},  
@@ -103,14 +115,18 @@ const routes: Route[] = [
       { path: 'demande-vendeur', component: DemandevendeurAdminComponent}, 
       { path: 'paiment', component: PaimentComponent},
       { path: 'parten', component: PartEnComponent},
+      { path: 'commentaires', component: CommentairesComponent},
+      { path: 'signalisation', component: SignalisationComponent},
 ];
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
     AppComponent,
     ArticlesVendeurComponent,
     ArticlesAdminComponent,
     NotFoundComponent,
+    CommentairesComponent,
     CategoriesAdminComponent,
     LoginComponent,
     ArticlesComponent,
@@ -152,15 +168,29 @@ const routes: Route[] = [
     PanierComponent,
     CardsComponent,
     PartEnComponent,
+    DetailArtComponent,
+    CommentaireComponent,
+    ModificationCommentaireDialog,
+    CommentairesComponent,
+    SignalementComponent,
+    SignalisationComponent
   ],
   imports: [
     MatSnackBarModule,
+    MatDialogModule,
     BrowserModule,
+    MatSnackBarModule,
+    MatIconModule,
     MatCardModule,
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    MatCardModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatProgressBarModule,
+    MatListModule,
     RouterModule.forRoot(routes),
    //CarouselModule,
     ToastrModule.forRoot({

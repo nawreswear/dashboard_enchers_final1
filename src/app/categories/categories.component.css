@@ -299,12 +299,12 @@ label {
   }
   
   .card {
-    width: 400px; /* Largeur fixe de chaque carte */
+    width: 420px; /* Largeur fixe de chaque carte */
     height: 400px; /* Hauteur fixe de chaque carte */
     margin-right: 10px; 
-    margin-left: 60px;
+    margin-left: 10px;
     margin-top: 15px;/* Espacement entre les cartes sur le côté droit */
-    margin-bottom: 35px; /* Espacement entre les cartes en bas */
+    margin-bottom: 50px; /* Espacement entre les cartes en bas */
     border: 1px solid #ccc; /* Bordure de la carte */
     border-radius: 5px; /* Coins arrondis de la carte */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre de la carte */

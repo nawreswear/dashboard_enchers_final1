@@ -32,16 +32,21 @@
                         <i class="text-xl text-white text-muted-foreground fa-solid fa-sign-out"></i>
                 </span>
                     <span (click)="toggleUserInfo()" class="h-10 relative w-10 grid rounded-full place-content-center bg-black">
-                      <i class="fas fa-user-circle text-xl text-white text-muted-foreground mr-2"></i>
-                      <div class="arrow-down"></div>
-                      <div *ngIf="showUserInfo" class="profile-bubble">
-                        <p class="info-label">Email:</p>
-                        <p class="info-value">{{ authService.getUserEmail() }}</p>
-                        <p class="info-label">Nom:</p>
-                        <p class="info-value">{{ authService.getUserPassword() }}</p>
-                        <p class="info-label">Type:</p>
-                        <p class="info-value">{{ authService.getUserType() }}</p>
-                      </div>
+                        <img [src]="this.photoUrl" alt="Image de l'utilisateur"style="width: 40px;height: 40px;border-radius: 50%;margin-right: 10px;">
+                        <div *ngIf="showUserInfo" class="profile-bubble">
+                            <span class="info-pair">
+                              <p class="info-label"><i class="fas fa-envelope"></i> Email:</p>
+                              <p class="info-value">{{ authService.getUserEmail() }}</p>
+                            </span>
+                            <span class="info-pair">
+                              <p class="info-label"><i class="fas fa-user"></i> Nom:</p>
+                              <p class="info-value">{{ authService.getUserPassword() }}</p>
+                            </span>
+                            <span class="info-pair">
+                              <p class="info-label"><i class="fas fa-shield-alt"></i> Type:</p>
+                              <p class="info-value">{{ authService.getUserType() }}</p>
+                            </span>
+                          </div>
                     </span>
                 
                 <span (click)="togglePosition()"
