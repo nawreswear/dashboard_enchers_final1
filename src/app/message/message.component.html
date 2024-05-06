@@ -1,0 +1,37 @@
+<div class="message-container">
+    <div *ngFor="let message of messages" class="message">
+      <div class="message-header">
+        <div class="user-info">
+          <img
+            [src]="message?.user?.photo"
+            style="
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              margin-right: 10px;
+            "
+            alt="Profile Picture"
+            class="profile-pic"
+          />
+          <div class="user-details">
+            <div class="user-name">{{ message.user.nom }}</div>
+            <div class="post-time">{{ message.date | date:'medium' }}</div>
+          </div>
+        </div>
+        <button (click)="deleteMessage(message.id)" class="delete-btn" style="color: #fff;
+        background-color: #dc3545;
+        margin-right: 5px;
+        border-radius: 5px;
+        padding: 5px 5px; 
+        font-size: 14px;">
+            <i class="fas fa-trash" style="  font-size: 15px;"></i> 
+        </button>
+      </div>
+      <div class="message-body">
+        <p>{{ message.message }}</p>
+        <div class="message-actions">
+          </div>
+      </div>
+    </div>
+  </div>
+  

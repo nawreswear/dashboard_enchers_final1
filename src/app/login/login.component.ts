@@ -26,11 +26,12 @@ export class LoginComponent {
         if (data.type && data.type.includes('admin')) {
           // Redirect to admin dashboard
           this.router.navigate(['/admin']);
-      
+        
         } else {
           // Redirect to home page for regular users
           this.router.navigate(['/']);
         }
+       
       },
       err => {
         this.errorMessage = err.error.message;

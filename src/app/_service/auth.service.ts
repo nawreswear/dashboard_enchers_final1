@@ -107,13 +107,11 @@ export class AuthService {
           map((response: LoginResponse) => {
             // Enregistrement des informations d'authentification dans le local storage
             localStorage.setItem('token', response.token);
-
-        localStorage.setItem('email', response.email);
-        localStorage.setItem('password', response.password);
-        localStorage.setItem('username', response.nom);
-        localStorage.setItem('type', JSON.stringify(response.type));
-        localStorage.setItem('photo', response.photo);
-        
+            localStorage.setItem('email', response.email);
+            localStorage.setItem('password', response.password);
+            localStorage.setItem('username', response.nom);
+            localStorage.setItem('type', JSON.stringify(response.type));
+            localStorage.setItem('photo', response.photo);
             // Mettre à jour le sujet isLoggedInSubject
             this.isLoggedInSubject.next(true);
             return response;

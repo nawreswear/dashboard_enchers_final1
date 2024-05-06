@@ -60,11 +60,6 @@ export class HeaderComponent implements OnInit {
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
       if (user) {
-        // this.type = user.type;
-        // this.showAdminBoard = this.type.includes('ADMIN');
-        // this.showVendeurBoard = this.type.includes('VENDEUR');
-        // this.showVendeurBoard = this.type.includes('USER');
-        // this.username = user.username;
       }
     }
 

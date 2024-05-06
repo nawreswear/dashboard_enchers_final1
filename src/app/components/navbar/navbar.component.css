@@ -125,6 +125,25 @@
     font-weight: bold;
    background-color:darkgrey;
   }
+  .toggled-message {
+    display: none; /* Initially hidden */
+    position: absolute; /* Positioned above the user info bubble */
+    top: 100%; /* Aligned below the user info bubble */
+    left: 0; /* Aligned to the left edge of the bubble */
+    background-color: #fff; /* White background */
+    border-radius: 4px; /* Rounded corners */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 10px;
+    z-index: 1; /* Ensure it displays above other elements */
+  }
+  
+  .toggled-message.active {
+    display: block; /* Display when toggled */
+  }
+
+  .nav-link i {
+    margin-right: 5px; /* Espace entre l'icône et le texte */
+  }
   .svg-icon {
     width: 2vw; /* Adjust the size as needed */
     height: 2vw;

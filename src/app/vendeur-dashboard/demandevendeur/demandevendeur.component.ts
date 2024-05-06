@@ -3,8 +3,7 @@ import { demandevendeurService } from '../demandevendeur.service';
 import { Vendeur } from '../vendeur';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 interface demande_Vendeur {
   id: number | undefined;
   datedem: Date;
@@ -24,7 +23,7 @@ export class DemandevendeurComponent {
   messageErreurVisible: boolean = false;
   messageErreur: string = '';
   userIdd: number | undefined;
-  constructor(private demandevendeurservice: demandevendeurService,
+  constructor(private demandevendeurservice: demandevendeurService, private snackBar: MatSnackBar,
     public router: Router) {
       this.getUserId(); 
     const storedToken = localStorage.getItem('token');
@@ -67,9 +66,15 @@ export class DemandevendeurComponent {
           console.log('Soumission du formulaire réussie.');
           this.vendeur = new Vendeur();
           this.messageSuccessVisible = true;
+          this.snackBar.open('La demande est envoyer avec succès!', 'Fermer', {
+            duration: 3000
+          });
         },
         error => {
           console.error('Erreur lors de l\'envoi de la demande :', error);
+          this.snackBar.open('Erreur lors de l\'envoi de la demande!', 'Fermer', {
+            duration: 3000
+          });
           if (error.status === 500) {
             this.messageErreur = 'Une erreur interne du serveur est survenue. Veuillez réessayer plus tard.';
           } else {
@@ -80,6 +85,7 @@ export class DemandevendeurComponent {
       );
     } else {
       console.error('La valeur de userId n\'est pas une valeur numérique valide :', this.userIdd);
+    
       // Gérer cette situation d'erreur selon vos besoins
     }
   }

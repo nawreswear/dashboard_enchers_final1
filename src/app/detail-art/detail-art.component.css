@@ -1,7 +1,7 @@
 /* Existing styles */
 
 .article-details-container img {
-    transition: none; /* Remove automatic zoom transition */
+    transition: none; 
   }
   
   .article-details {
@@ -74,26 +74,6 @@
     gap: 10px; /* Add spacing between options */
   }
   
-  .zoom-button, .download-button {
-    background-color: transparent; /* Transparent background */
-    border: none; /* No border */
-    cursor: pointer; /* Indicate clickable area */
-    transition: opacity 0.2s ease; /* Add hover effect transition */
-  }
-  
-  .zoom-button:hover, .download-button:hover {
-    opacity: 0.8; /* Slightly reduce opacity on hover */
-  }
-  
-  .zoom-button i, .download-button i {
-    font-size: 20px; /* Adjust icon size */
-    color: #fff; /* White icon color */
-  }
-  .zoom-out-button i {
-    font-size: 20px; /* Adjust icon size */
-    color: #fff; /* White icon color */
-    z-index: 3;
-  }
   /* Article details */
 .article-details {
   background-color: #fff;

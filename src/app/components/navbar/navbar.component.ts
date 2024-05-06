@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
-import { User } from 'src/app/interfaces/user';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/_service/auth.service';
 import { CardsComponent } from 'src/app/shopping-cart/cards/cards.component';
@@ -15,6 +14,8 @@ import { PartEnService } from 'src/app/part-en.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Observable, map } from 'rxjs';
+import { Message, MessageService } from 'src/app/message.service';
+import { User } from 'src/app/_service/user';
 interface Enchere {
   id?: number;
   dateDebut: string;
@@ -59,7 +60,7 @@ cheminImage: string = '';
   searchValue: string | null = null;
   menuOpened: boolean = false;
   currentPath: string | null = '';
-  userData: User | null = null;
+ userData: User | null = null;
   userMenu: boolean = false;
   showUserInfo = false;
   urlPattern = new RegExp('^(https?:\\/\\/)?' + // Protocole
@@ -75,13 +76,14 @@ cheminImage: string = '';
   nomImage$: Observable<string> | undefined;
   nom: string | null = null; // Définissez le nom de l'utilisateur ici
   photoUrl: string = '';
+  messages: Message[] = [];
   constructor(
     public authService: AuthService,
     private router: Router,public panierService: PanierService,
     private authenticationService: AuthService, private encherService :  EnchersServiceService,
     private toastrService: ToastrService, private snackBar: MatSnackBar, private  partEnService : PartEnService,
-    private enchereService: EnchersServiceService,private categoriesService:CategoriesService
-    
+    private enchereService: EnchersServiceService,private categoriesService:CategoriesService,
+    private messageService: MessageService , 
   ) {
     this.userType = this.authService.getUserType();
     this.router.events.subscribe((path: any) => {
@@ -106,6 +108,26 @@ cheminImage: string = '';
     this.getPartenIdByUserId();
     console.log("this.nom", this.nom);
 
+  }
+
+  getMessages(): void {
+    this.messageService.getMessages()
+      .subscribe(messages => {
+        this.messages = messages;
+        this.messages.forEach(message => {
+         // this.getUserPhoto(message.user);
+        });
+      });
+  }
+
+  
+
+  
+  deleteMessage(id: number): void {
+    this.messageService.deleteMessage(id)
+      .subscribe(() => {
+        this.messages = this.messages.filter(message => message.id !== id);
+      });
   }
 
  getUserPhoto(): void {

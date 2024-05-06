@@ -5,10 +5,8 @@
          
             <button class="zoom-out-button" (click)="zoomOutImage()">
                 <i class="fas fa-search-minus" style="color: black;"></i> </button>
-        </div>-->
-     
+        </div>-->     
         <img [src]="selectedArticle?.photo" alt="" style="width: 600px; height: 550px; max-width: 600px;">
-
       </div>
     <div class="article-details">
       <button class="" (click)="closeArticleDetails()"><i class="fas fa-times" style="color: rgb(23, 8, 90); border-radius: 50%;"></i></button>
@@ -29,10 +27,6 @@
           <button (click)="ajouterCommentaire()">
             <i class="fas fa-comment-dots fa-inverse" style="color: #110404; font-size: 50px;"></i> 
           </button>
-          
-          
-          
-
           <ul class="comment-list">
             <ng-container *ngFor="let commentaire of commentaires; let i = index">
               <li  style="font-weight: bold;" class="comment-item" *ngIf="i < 3 || afficherTousLesCommentaires">
@@ -62,8 +56,6 @@
           <button *ngIf="selectedArticle && commentaires.length > 3" (click)="afficherTousLesCommentaires = !afficherTousLesCommentaires" 
             class="button-afficher">
             {{ afficherTousLesCommentaires ? 'Masquer les commentaires' : 'Afficher plus de commentaires' }}
-          </button>
-         
-           
+          </button>        
   </div>
   

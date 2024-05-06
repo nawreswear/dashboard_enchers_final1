@@ -160,8 +160,7 @@ export class ArticlesAdminComponent implements OnInit {
           this.snackBar.open('Article supprimé avec succès!', 'Fermer', {
             duration: 3000
           });
-          this.getAllArticles();
-          window.location.reload();
+          this.refreshAllArticles();
         }
       },
       (error: HttpErrorResponse) => {
@@ -173,7 +172,19 @@ export class ArticlesAdminComponent implements OnInit {
       }
     );
   }
-
+  refreshAllArticles(){
+    this.articleService.getAllArticles().subscribe(
+      (articles: Article[]) => {
+        this.articles = articles;
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Erreur lors du chargement des articles:', error);
+        this.snackBar.open('Erreur lors du chargement des articles!', 'Fermer', {
+          duration: 3000
+        });
+      }
+    );
+  }
   cancelCreation() {
     this.onCreatee = false;
     this.myForm.reset();

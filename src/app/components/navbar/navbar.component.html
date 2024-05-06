@@ -171,7 +171,16 @@
                   </div>
              
                   <div *ngIf="authService.isLoggedIn()" class="flex items-center space-x-4">
-                    <button (click)="logout()" class="btn btn-danger">Se déconnecter</button>
+                    <button (click)="logout()" class="btn btn-danger">
+                      <i class="fas fa-sign-out-alt" style="font-size: 25px;"></i> 
+                    </button>
+                
+               <a routerLink="/messages" class="nav-link">
+                      <i class="fas fa-comments fa"style="font-size: 25px;"></i>
+                    </a>  
+               
+                    
+                                      
                     <span (click)="toggleUserInfo()" class="h-10 relative w-10 grid rounded-full place-content-center bg-black">
                       <img [src]="this.photoUrl" alt="Image de l'utilisateur"style="width: 40px;height: 40px;border-radius: 50%;margin-right: 10px;">
                       <div *ngIf="showUserInfo" class="profile-bubble">

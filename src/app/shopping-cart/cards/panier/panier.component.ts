@@ -115,7 +115,7 @@ removeArticle(index: number) {
                         this.panierService.updatePanier(cart.id, cart).subscribe(
                           (response) => {
                             console.log("Cart updated successfully:", response);
-                            this.snackBar.open('Article supprimer dans le panier avec succès :', 'Fermer', {
+                            this.snackBar.open('Article supprimer dans le panier avec succès ', 'Fermer', {
                               duration: 3000
                             });
                             this.getPanierDetails;
@@ -207,7 +207,7 @@ removeArticle(index: number) {
                                               this.panierService.addToCart(article.id, cart.id, partnerId).subscribe(
                                                 (response) => {
                                                   console.log("Article ajouté au panier avec succès:", response);
-                                                  this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                                                  this.snackBar.open('Article ajouté au panier avec succès ', 'Fermer', {
                                                     duration: 3000
                                                   });
                                                   this.getPanierDetails;
@@ -264,7 +264,7 @@ removeArticle(index: number) {
                     this.panierService.addToCart(article.id, newCartId, partnerId).subscribe(
                         (response) => {
                             console.log("Article ajouté au panier avec succès :", response);
-                            this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                            this.snackBar.open('Article ajouté au panier avec succès ', 'Fermer', {
                               duration: 3000
                             });
                             this.getPanierDetails;
@@ -341,13 +341,7 @@ removeArticle(index: number) {
       this.onOrderFinished.emit(false);
       this.total = 0;
     }   */
-    showSuccessNotification() {
-      this.toastr.success('Paiement effectué avec succès', 'Paiement', {
-        toastClass: 'payment-notification',
-        progressBar: true,
-        positionClass: 'toast-top-center'
-      });
-    }
+  
     passerAuPaiement() {
       console.log("this.panier :", this.panierDetails);
       this.panier = this.panierDetails[0];
@@ -356,7 +350,9 @@ removeArticle(index: number) {
         (paiement: Paiement) => {
             console.log("Paiement effectué avec succès :", paiement);
             console.log("Panier :", this.panierDetails[0]);
-            this.showSuccessNotification();
+            this.snackBar.open('Paiement effectué avec succès ', 'Fermer', {
+              duration: 3000
+            });
             // Mettre à jour le statut du paiement
             this.paiementService.updatePaiementstatut(paiement.id).subscribe(
               (updatedPaiement: Paiement) => {
@@ -366,7 +362,7 @@ removeArticle(index: number) {
                   for (const article of panier.articles) {
                       this.articleService.supprimerArticleDuPanier(panier.id, article.id).subscribe(
                           (response) => {
-                              console.log('Article supprimé du panier avec succès :', response);
+                              console.log('Article supprimé du panier avec succès ', response);
                           
                               // Rechercher l'article dans panierItems pour obtenir son prix de vente
                               const articlee = this.panierItems.find(item => item.id === article.id);
@@ -523,7 +519,7 @@ removeArticle(index: number) {
     this.articleService.supprimerArticleDuPanier(panierId, articleId).subscribe(
         (response) => {
             console.log('Article supprimé du panier avec succès :', response);
-            this.snackBar.open('Article supprimé du panier avec succès :', 'Fermer', {
+            this.snackBar.open('Article supprimé du panier avec succès ', 'Fermer', {
               duration: 3000
             });
             this.getPanierDetails;
@@ -556,7 +552,7 @@ viderPanier(id: number): void {
     this.articleService.viderPanier(id).subscribe(
       () => {
         console.log('Le panier a été vidé avec succès');
-        this.snackBar.open('Le panier a été vidé avec succès :', 'Fermer', {
+        this.snackBar.open('Le panier a été vidé avec succès ', 'Fermer', {
           duration: 3000
         });
         // Ajoutez ici le traitement supplémentaire après la suppression du panier

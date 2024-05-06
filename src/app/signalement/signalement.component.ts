@@ -102,7 +102,7 @@ export class SignalementComponent {
       message: this.message,
       date: new Date(), // Date actuelle
       user: this.user, // Utiliser la propriété user au lieu de l'observable
-      users: [], // Remplissez avec les utilisateurs concernés si nécessaire
+      users: [this.user], // Remplissez avec les utilisateurs concernés si nécessaire
       type: this.type
     };
 
@@ -115,7 +115,7 @@ export class SignalementComponent {
         this.message = '';
         this.type = '';
         this.refreshsignale();
-        this.snackBar.open('"Signalement envoyé avec succès. Nous allons examiner cela.', 'Fermer', {
+        this.snackBar.open('Signalement envoyé avec succès.', 'Fermer', {
           duration: 3000,
       });
       },
@@ -126,4 +126,6 @@ export class SignalementComponent {
       }
     );
   }
+
+  
 }

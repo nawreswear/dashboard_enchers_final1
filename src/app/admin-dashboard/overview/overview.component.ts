@@ -96,7 +96,6 @@ export class OverviewComponent implements OnInit {
       // Extract the active route from the URL segments
       this.activeRoute = url[0].path;
     });
-  
   }   
 
 // [routerLink]="['/', item.name]

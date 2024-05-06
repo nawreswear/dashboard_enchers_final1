@@ -28,7 +28,7 @@
 
                 <!-- Icon for Logout -->
                 
-            <span *ngIf="authService.isLoggedIn()" (click)="logout()"  class="h-10   relative w-10 grid rounded-full place-content-center cursor-pointer bg-black ">
+            <span (click)="logout()"  class="h-10   relative w-10 grid rounded-full place-content-center cursor-pointer bg-black ">
                         <i class="text-xl text-white text-muted-foreground fa-solid fa-sign-out"></i>
                 </span>
                     <span (click)="toggleUserInfo()" class="h-10 relative w-10 grid rounded-full place-content-center bg-black">

@@ -12,6 +12,6 @@ export class User {
     cin: number = 0; 
     longitude: number = 0; 
     latitude: number = 0;
-    photo: String=''
+    photo: string=''
    
 }

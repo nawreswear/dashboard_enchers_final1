@@ -10,6 +10,7 @@
       <th>Type</th>
       <th>Numèro utilisateur</th>
       <th>Nom & Prénom </th>
+      <th>Action</th>
     </tr>
     <tr *ngFor="let signalement of signalements">
       <td>{{ signalement.id }}</td>
@@ -19,6 +20,11 @@
       <td>{{ signalement.user.id }}</td>
       <td>
         {{ signalement.user.nom }}   {{ signalement.user.prenom }}
+      </td>
+      <td>
+        <button type="button" class="btn btn-delete"  (click)="showAlert = true; deleteSignalement(signalement.id)">
+          <i class="fas fa-trash-alt"></i> 
+      </button>
       </td>
     </tr>
   </table>

@@ -1,0 +1,88 @@
+.message-container {
+    background-color: #f0f2f5;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .message {
+    display: flex;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-pic {
+    object-fit: cover;
+  }
+  
+  .user-details {
+    margin-left: 10px;
+  }
+  
+  .user-name {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .post-time {
+    font-size: 0.8rem;
+    color: #999;
+  }
+  
+  .delete-btn {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 5px; /* Add padding for the SVG icon */
+  }
+  
+  .delete-btn:hover {
+    color: #c00;
+  }
+  
+  .message-body {
+    margin-top: 5px; /* Spacing between message header and content */
+  }
+  
+  .message-actions {
+    display: flex; /* Container for reactions, comments, etc. */
+    margin-top: 5px; /* Spacing between message content and actions */
+  }
+  .toggled-message {
+  display: none; /* Initially hidden */
+  position: absolute; /* Positioned above the user info bubble */
+  top: 100%; /* Aligned below the user info bubble */
+  left: 0; /* Aligned to the left edge of the bubble */
+  background-color: #fff; /* White background */
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 10px;
+  z-index: 1; /* Ensure it displays above other elements */
+}
+
+.toggled-message.active {
+  display: block; /* Display when toggled */
+}
+  .reaction-icon {
+    font-size: 1.2rem;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  
+  /* Example styling for comment count */
+  .comment-count {
+    font-size: 0.8rem;
+    color: #999;
+  }
+  

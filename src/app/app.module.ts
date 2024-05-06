@@ -54,7 +54,6 @@ import { CardsComponent } from './shopping-cart/cards/cards.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PartEnComponent } from './admin-dashboard/part-en/part-en.component';
 import { DetailArtComponent } from './detail-art/detail-art.component';
-import { CommentaireComponent } from './commentaire/commentaire.component';
 import { ModificationCommentaireDialog } from './modification-commentaire/modification-commentaire.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CommentairesComponent } from './admin-dashboard/commentaires/commentaires.component';
@@ -63,6 +62,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatListModule } from '@angular/material/list';
 import { SignalementComponent } from './signalement/signalement.component';
 import { SignalisationComponent } from './admin-dashboard/signalisation/signalisation.component';
+import { MessageComponent } from './message/message.component';
+import { MessageService } from './message.service';
 
 const routes: Route[] = [
   {
@@ -80,8 +81,8 @@ const routes: Route[] = [
       { path: 'about', component: AboutComponent },
       { path: 'demandevendeur', component: DemandevendeurComponent },
       { path: 'articles/vendeur/articlesvendeur', component: ArticlesVendeurComponent },
-      { path: 'commentaire', component: CommentaireComponent },
       { path: 'detail-article/:id', component: DetailArtComponent },
+      { path: 'messages', component: MessageComponent }
     ],
   },
   {
@@ -98,8 +99,8 @@ const routes: Route[] = [
       { path: 'enchere', component: EnchersuserComponent },
       { path: 'about', component: AboutComponent },
       { path: 'articlesvendeur', component: ArticlesVendeurComponent },
-      { path: 'commentaire', component: CommentaireComponent },
       { path: 'detail-article/:id', component: DetailArtComponent },
+      { path: 'messages', component: MessageComponent }
     ],
   },
       {path: 'admin',component: AdminDashboardComponent,},  
@@ -117,6 +118,7 @@ const routes: Route[] = [
       { path: 'parten', component: PartEnComponent},
       { path: 'commentaires', component: CommentairesComponent},
       { path: 'signalisation', component: SignalisationComponent},
+      { path: 'messages', component: MessageComponent }
 ];
 
 @NgModule({
@@ -169,11 +171,11 @@ const routes: Route[] = [
     CardsComponent,
     PartEnComponent,
     DetailArtComponent,
-    CommentaireComponent,
     ModificationCommentaireDialog,
     CommentairesComponent,
     SignalementComponent,
-    SignalisationComponent
+    SignalisationComponent,
+    MessageComponent,
   ],
   imports: [
     MatSnackBarModule,

@@ -39,7 +39,7 @@ export class DetailArtComponent implements OnInit {
  public isZoomed = false;
  zoomedImageScale = 1; 
  username:string ='';
-
+ selectedArticleId: number;
  photo:string='';
  articleId: number | undefined;
  afficherTousLesCommentaires = false;
@@ -61,16 +61,17 @@ export class DetailArtComponent implements OnInit {
     private articleService: ArticleService,
   private commentaireService: CommentaireService ,private snackBar: MatSnackBar ,public dialog: MatDialog
   ) {
-   
+    this.selectedArticleId = 0;
   }
 
   ngOnInit(): void {
-    this.refreshCommentaires();
     this.route.params.subscribe(params => {
       const articleId = +params['id']; // Récupérer l'ID de l'article depuis les paramètres de la route
       this.articleService.getArticleById(articleId).subscribe(article => {
-        this.selectedArticle = article; // Mettre à jour les détails de l'article avec les données récupérées
-        this.getCommentairesPourArticle(articleId); // Appeler la méthode pour récupérer les commentaires
+        this.selectedArticle = article; 
+        this.selectedArticleId = articleId; // Mettre à jour les détails de l'article avec les données récupérées
+        this.getCommentairesPourArticle(articleId); 
+        this.refreshCommentaires(articleId);// Appeler la méthode pour récupérer les commentaires
       });
     });
     const storedToken = localStorage.getItem('token');
@@ -121,7 +122,7 @@ supprimerCommentaire(commentaire: Commentaire): void {
       () => {
         console.log("Commentaire supprimé :", commentaire);
         // Rafraîchir les commentaires après la suppression
-        this.refreshCommentaires();
+        this.refreshCommentaires(this.selectedArticleId);
         // Afficher le snackbar
         this.snackBar.open('Commentaire supprimé avec succès', 'Fermer', {
           duration: 2000,
@@ -140,17 +141,19 @@ ouvrirFenetreModification(commentaire: Commentaire): void {
     data: commentaire
   });
 }
-
-refreshCommentaires(): void {
-  this.commentaireService.getAllCommantaires().subscribe(
-    commentaires => {
-      this.commentaires = commentaires;
-    },
-    error => {
-      console.error("Erreur lors de la récupération des commentaires :", error);
-    }
-  );
+refreshCommentaires(articleId: number): void {
+  this.commentaireService.getCommentairesParIdArticle(articleId)
+    .subscribe(
+      commentaires => {
+        this.commentaires = commentaires; // Mettre à jour le tableau de commentaires
+        console.log('Commentaires récupérés avec succès :', this.commentaires);
+      },
+      error => {
+        console.error('Erreur lors de la récupération des commentaires :', error);
+      }
+    );
 }
+
 
 modifierCommentaire(commentaire: Commentaire): void {
   console.log("ID du commentaire à modifier :", commentaire.id); // Affichage de l'ID du commentaire
@@ -159,7 +162,7 @@ modifierCommentaire(commentaire: Commentaire): void {
       (data: Commentaire) => {
         console.log("Commentaire modifié :", data);
         // Rafraîchir les commentaires après la modification
-        this.refreshCommentaires();
+        this.refreshCommentaires(this.selectedArticleId);
         // Afficher le snackbar
         this.snackBar.open('Commentaire modifié avec succès', 'Fermer', {
           duration: 2000,
@@ -200,7 +203,6 @@ getCommentairesPourArticle(articleId: number): void {
 ajouterCommentaire() {
   // Afficher l'objet nouveauCommentaire dans la console pour vérifier ses propriétés
   console.log("Nouveau commentaire :", this.nouveauCommentaire);
-
   // Vérifier si userId est défini
   if (this.userId === undefined) {
     console.error("L'identifiant de l'utilisateur est manquant.");
@@ -233,6 +235,10 @@ ajouterCommentaire() {
       this.nouveauCommentaire.object = '';
       this.nouveauCommentaire.message = '';
       console.log('Commentaire ajouté avec succès :', data);
+      this.refreshCommentaires(this.selectedArticleId);
+      this.snackBar.open('Commentaire ajouté avec succès', 'Fermer', {
+        duration: 2000,
+      });
     },
     (error) => {
       console.error('Une erreur est survenue lors de l\'ajout du commentaire : ', error);

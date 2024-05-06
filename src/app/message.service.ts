@@ -14,7 +14,7 @@ export interface Message {
 })
 export class MessageService {
 
-  private baseUrl = 'http://localhost:3008/'; // Remplacez par l'URL de votre serveur Spring
+  private baseUrl = 'http://localhost:3007/'; // Remplacez par l'URL de votre serveur Spring
 
   constructor(private http: HttpClient) { }
 

@@ -180,10 +180,10 @@ export class ArticlesComponent implements OnInit {
     this.selectedartIndex = (this.selectedartIndex === index) ? -1 : index;
     console.log("Options affichées pour l'article à l'index", index, ":", this.selectedartIndex === index);
   }
-  ouvrirsignalement(article: Article): void {
+  ouvrirsignalement(): void {
     this.dialog.open(SignalementComponent, {
       width: '400px',
-      data: article
+    //  data: article
     });
   }
   
@@ -273,7 +273,7 @@ addToCart(article: any) {
                                             this.panierService.updatePanier(cart.id, cart).subscribe(
                                                 (response) => {
                                                     console.log("Panier mis à jour avec succès :", response);
-                                                    this.snackBar.open('Panier mis à jour avec succès :', 'Fermer', {
+                                                    this.snackBar.open('Panier mis à jour avec succès ', 'Fermer', {
                                                       duration: 3000
                                                     });
                                                     this.getPanierDetails;
@@ -292,7 +292,7 @@ addToCart(article: any) {
                                             this.panierService.addToCart(article.id, cart.id, partnerId).subscribe(
                                               (response) => {
                                                 console.log("Article ajouté au panier avec succès:", response);
-                                                this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                                                this.snackBar.open('Article ajouté au panier avec succès ', 'Fermer', {
                                                   duration: 3000
                                                 });
                                                 this.getPanierDetails;
@@ -355,7 +355,7 @@ createCart(partnerId: any, article: any) {
                       (response) => {
                           console.log("Article ajouté au panier avec succès :", response);
                        
-                          this.snackBar.open('Article ajouté au panier avec succès :', 'Fermer', {
+                          this.snackBar.open('Article ajouté au panier avec succès ', 'Fermer', {
                             duration: 3000
                           });
                           this.getPanierDetails;
@@ -423,7 +423,7 @@ createCart(partnerId: any, article: any) {
         },
         (error: HttpErrorResponse) => {
           console.error('Erreur lors de la mise à jour de l\'article:', error);
-          this.snackBar.open('Erreur lors de la mise à jour de l\'article: ' + error.message, 'Fermer', {
+          this.snackBar.open('Erreur lors de la mise à jour de l\'article  ' + error.message, 'Fermer', {
             duration: 3000
           });
         }
@@ -637,7 +637,7 @@ editArticleFunc(article: Article) {
         },
         (error: HttpErrorResponse) => {
           console.error('Erreur lors de la création de l\'article:', error);
-          this.snackBar.open('Erreur lors de la création de l\'article: ' + error.message, 'Fermer', {
+          this.snackBar.open('Erreur lors de la création de l\'article ' + error.message, 'Fermer', {
             duration: 3000
           });
         }
